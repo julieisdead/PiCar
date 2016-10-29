@@ -43,6 +43,27 @@
         </StackLayout>
 
         <StackLayout Orientation="Horizontal">
+          <Label Text="Username"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding Username}"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Password"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding Password}"
+                 IsPassword="True"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+          
+        <StackLayout Orientation="Horizontal">
           <Label Text="MQTT Port"
                  WidthRequest="100"
                  VerticalOptions="Center"/>

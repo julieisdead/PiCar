@@ -245,15 +245,23 @@ namespace PiCar
 
             CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
             string connectionString = $"tcp://{server}:{settings.MqttPort}";
-            ConnectMqtt(connectionString);
+            ConnectMqtt(connectionString, settings.Username, settings.Password);
         }
 
-        public void ConnectMqtt(string connectionString)
+        public void ConnectMqtt(string connectionString, string username, string password)
         {
             try
             {
-                client = MqttClientFactory.CreateClient(connectionString,
-                    Guid.NewGuid().ToString(), "mosquitto", "password");
+                if (string.IsNullOrEmpty(username))
+                {
+                    client = MqttClientFactory.CreateClient(connectionString,
+                        Guid.NewGuid().ToString());
+                }
+                else
+                {
+                    client = MqttClientFactory.CreateClient(connectionString,
+                        Guid.NewGuid().ToString(), username , password);
+                }
                 client.Connected += client_Connected;
                 client.ConnectionLost += client_ConnectionLost;
                 client.PublishArrived += client_PublishArrived;

@@ -13,6 +13,8 @@ namespace PiCar
             _remoteServer = string.Empty;
             _localSSID = string.Empty;
             _localServer = string.Empty;
+            _username = string.Empty;
+            _password = string.Empty;
             _mqttPort = 1883;
             _cameraPort = 8081;
         }
@@ -50,6 +52,27 @@ namespace PiCar
                 SaveSettings();
             }
         }
+
+        public string Username
+        {
+            get { return _username; }
+            set
+            {
+                _username = value;
+                SaveSettings();
+            }
+        }
+
+        public string Password
+        {
+            get { return _password; }
+            set
+            {
+                _password = value;
+                SaveSettings();
+            }
+        }
+
         public int MqttPort
         {
             get { return _mqttPort; }
@@ -72,6 +95,8 @@ namespace PiCar
         private string _remoteServer;
         private string _localSSID;
         private string _localServer;
+        private string _username;
+        private string _password;
         private int _mqttPort;
         private int _cameraPort;
 
