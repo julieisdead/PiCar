@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xlabs="clr-namespace:XLabs.Forms.Controls;assembly=XLabs.Forms"
+             xmlns:local="clr-namespace:PiCar;assembly=PiCar"
+             x:Class="PiCar.AppPage">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+
+      <Style x:Key="ButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="#90A4AE"/>
+        <Setter Property="BorderRadius" Value="50"/>
+        <Setter Property="TextColor" Value="#ECEFF1" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Opacity" Value="0.25" />
+      </Style>
+
+    </ResourceDictionary>
+  </ContentPage.Resources>
+
+  <ContentPage.Content>
+    <RelativeLayout x:Name="MainLayout">
+
+      <xlabs:HybridWebView x:Name="CarCamView"
+                           BackgroundColor="Transparent"/>
+
+      <Label x:Name="StatusText"
+             TextColor="#ECEFF1"
+             FontSize="18"/>
+      
+      <local:CarButton x:Name="ForwardButton"
+                       Text="Forward"
+                       Touched="OnForwardTouched"
+                       Style="{StaticResource ButtonStyle}"/>
+
+      <local:CarButton x:Name="ReverseButton"
+                       Text="Reverse"
+                       Touched="OnReverseTouched"
+                       Style="{StaticResource ButtonStyle}"/>
+
+      <local:CarButton x:Name="LeftButton"
+                       Text="Left"
+                       Touched="OnLeftTouched"
+                       Style="{StaticResource ButtonStyle}"/>
+
+      <local:CarButton x:Name="RightButton"
+                       Text="Right"
+                       Touched="OnRightTouched"
+                       Style="{StaticResource ButtonStyle}"/>
+
+    </RelativeLayout>
+  </ContentPage.Content>
+
+  <ContentPage.ToolbarItems>
+    <ToolbarItem Text="Settings"
+                 Order="Primary"
+                 Icon="ic_more_horiz_white_24dp.png"
+                 Clicked="SettingsClicked"/>
+
+  </ContentPage.ToolbarItems>
+</ContentPage>

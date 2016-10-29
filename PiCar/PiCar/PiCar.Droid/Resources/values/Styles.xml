@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+  <style name="Theme.Car" parent="@android:style/Theme.Material">
+    <item name="android:colorPrimary">@color/myColorPrimary</item>
+    <item name="android:colorPrimaryDark">@color/myColorPrimaryDark</item>
+    <item name="android:colorAccent">@color/myColorAccent</item>
+    <item name="android:windowBackground">@color/myWindowBackground</item>
+    <item name="windowActionModeOverlay">true</item>
+  </style>
+</resources>
