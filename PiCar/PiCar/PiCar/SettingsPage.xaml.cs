@@ -5,8 +5,6 @@ namespace PiCar
 {
 	public partial class SettingsPage : ContentPage
 	{
-	    public static bool IsOpen;
-
 		public SettingsPage ()
 		{
 			InitializeComponent ();
@@ -17,15 +15,14 @@ namespace PiCar
 
         private void BackClick(object sender, EventArgs e)
         {
-            if(!IsOpen) return;
-            IsOpen = false;
+            Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
 
 	    protected override void OnAppearing()
         {
-            IsOpen = true;
+            Settings.IsOpen = true;
             base.OnAppearing();
 	    }
-	}
+    }
 }

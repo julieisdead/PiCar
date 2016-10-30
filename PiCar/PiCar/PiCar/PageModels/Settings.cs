@@ -25,6 +25,8 @@ namespace PiCar
             return JsonConvert.DeserializeObject<Settings>(settings);
         }
 
+        public static bool IsOpen { get; set; }
+
         public string RemoteServerName
         {
             get { return _remoteServer; }

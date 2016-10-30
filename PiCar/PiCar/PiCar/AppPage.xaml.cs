@@ -13,8 +13,7 @@ namespace PiCar
         private Movement movement;
 
         private IMqtt client;
-        private bool isSettings;
-
+        
         public AppPage()
         {
             InitializeComponent();
@@ -26,12 +25,11 @@ namespace PiCar
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            movement = new Movement();
+
             StatusText.Text = "Connecting...";
-            isSettings = false;
             ConnectToServer();
-            SendToMosquitto(movement.ToString());
         }
+
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
@@ -219,7 +217,6 @@ namespace PiCar
                             return parent.Y + parent.Height * 0.5 + 115;
                         }), Constraint.Constant(75), Constraint.Constant(75));
                     ConnectToServer();
-
                 }
             }
         }
@@ -294,6 +291,9 @@ namespace PiCar
         {
             StatusText.Text = "Mqtt client connected.";
             RegisterOurSubscriptions();
+
+            movement = new Movement();
+            SendToMosquitto(movement.ToString());
         });
 
         private void client_ConnectionLost(object sender, EventArgs e)
@@ -323,8 +323,7 @@ namespace PiCar
 
         private void ShowSettingsPage()
         {
-            if (isSettings) return;
-            isSettings = true;
+            if (Settings.IsOpen) return;
             Navigation.PushAsync(new SettingsPage(), true);
         }
 
