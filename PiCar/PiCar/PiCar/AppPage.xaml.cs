@@ -40,28 +40,28 @@ namespace PiCar
         private void OnForwardTouched(object sender, EventArgs e)
         {
             if (movement.Reverse) return;
-            movement.Forward = ((CarButton)sender).State;
+            movement.Forward = ((CarButton)sender).State == CarButtonState.Down;
             MoveCar();
         }
 
         private void OnReverseTouched(object sender, EventArgs e)
         {
             if (movement.Forward) return;
-            movement.Reverse = ((CarButton)sender).State;
+            movement.Reverse = ((CarButton)sender).State == CarButtonState.Down;
             MoveCar();
         }
 
         private void OnLeftTouched(object sender, EventArgs e)
         {
             if (movement.Right) return;
-            movement.Left = ((CarButton)sender).State;
+            movement.Left = ((CarButton)sender).State == CarButtonState.Down;
             MoveCar();
         }
 
         private void OnRightTouched(object sender, EventArgs e)
         {
             if (movement.Left) return;
-            movement.Right = ((CarButton) sender).State;
+            movement.Right = ((CarButton) sender).State == CarButtonState.Down;
             MoveCar();
         }
 
