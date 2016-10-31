@@ -178,7 +178,7 @@ namespace PiCar
             if (string.IsNullOrEmpty(server))
                 ShowSettingsPage();
 
-            StatusText.Text = "Connecting...";
+            Toaster("Connecting...");
 
             string html = "<html><head><style>" +
                           $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
@@ -235,15 +235,15 @@ namespace PiCar
 
         private void client_Connected(object sender, EventArgs e) => Device.BeginInvokeOnMainThread(() =>
         {
-            StatusText.Text = "Mqtt client connected.";
+            Toaster("Client connected.");
             RegisterOurSubscriptions();
 
             movement = new Movement();
             SendToMosquitto(movement.ToString());
         });
 
-        private void client_ConnectionLost(object sender, EventArgs e)
-            => Device.BeginInvokeOnMainThread(() => StatusText.Text = "Client connection lost.");
+        private static void client_ConnectionLost(object sender, EventArgs e)
+            => Device.BeginInvokeOnMainThread(() => Toaster("Client connection lost."));
 
         private void RegisterOurSubscriptions()
         {
@@ -253,7 +253,7 @@ namespace PiCar
             }
             catch
             {
-                StatusText.Text = "Not Connected to a broker";
+                Toaster("Not Connected to a broker");
             }
         }
 
@@ -274,5 +274,7 @@ namespace PiCar
         }
 
         private void MoveCar() => SendToMosquitto(movement.ToString());
+
+        private static void Toaster(string message) => DependencyService.Get<INotifier>().MakeToast(message);
     }
 }

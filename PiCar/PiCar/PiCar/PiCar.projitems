@@ -14,6 +14,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\CarButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Movement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\BaseConnectivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\ConnectionType.cs" />
