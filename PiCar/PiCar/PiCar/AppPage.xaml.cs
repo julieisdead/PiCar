@@ -13,7 +13,7 @@ namespace PiCar
         private Movement movement;
 
         private IMqtt client;
-        
+
         public AppPage()
         {
             InitializeComponent();
@@ -25,8 +25,6 @@ namespace PiCar
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
-            StatusText.Text = "Connecting...";
             ConnectToServer();
         }
 
@@ -83,68 +81,41 @@ namespace PiCar
 
                     //Car Cam View
                     MainLayout.Children.Add(CarCamView,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + parent.Width * 0.15;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width * 0.7;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Height;
-                        }));
+                        Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15),
+                        Constraint.RelativeToParent((parent) => parent.Y),
+                        Constraint.RelativeToParent((parent) => parent.Width*0.7),
+                        Constraint.RelativeToParent((parent) => parent.Height));
 
                     // StatusText
                     MainLayout.Children.Add(StatusText,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + parent.Width * 0.15 + 20;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Height - StatusText.Height - 5;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width * 0.7;
-                        }), Constraint.Constant(StatusText.Height));
+                        Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15 + 20),
+                        Constraint.RelativeToParent((parent) => parent.Height - StatusText.Height - 5),
+                        Constraint.RelativeToParent((parent) => parent.Width*0.7),
+                        Constraint.Constant(StatusText.Height));
 
                     MainLayout.Children.Add(ForwardButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + 20;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.2 + 20;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.X + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
 
                     MainLayout.Children.Add(ReverseButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + 60;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.2 + 115;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.X + 60),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
 
                     MainLayout.Children.Add(RightButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width - 95;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.2 + 20;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.Width - 95),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
 
                     MainLayout.Children.Add(LeftButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width - 135;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.2 + 115;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.Width - 135),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
                     ConnectToServer();
                 }
                 else
@@ -153,69 +124,42 @@ namespace PiCar
                     MainLayout.Children.Clear();
 
                     // Car Cam View
-                    MainLayout.Children.Add(CarCamView, 
-                        Constraint.RelativeToParent((parent) => 
-                        {
-                            return parent.X;
-                        }), Constraint.RelativeToParent((parent) => 
-                        {
-                            return parent.Y;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Height * 0.5;
-                        }));
+                    MainLayout.Children.Add(CarCamView,
+                        Constraint.RelativeToParent((parent) => parent.X),
+                        Constraint.RelativeToParent((parent) => parent.Y),
+                        Constraint.RelativeToParent((parent) => parent.Width),
+                        Constraint.RelativeToParent((parent) => parent.Height*0.5));
 
                     // StatusText
                     MainLayout.Children.Add(StatusText,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + 20;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Height * 0.5 - StatusText.Height * 1.5;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width;
-                        }), Constraint.Constant(StatusText.Height));
+                        Constraint.RelativeToParent((parent) => parent.X + 20),
+                        Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5),
+                        Constraint.RelativeToParent((parent) => parent.Width),
+                        Constraint.Constant(StatusText.Height));
 
                     MainLayout.Children.Add(ForwardButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + 20;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.5 + 20;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.X + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
 
                     MainLayout.Children.Add(ReverseButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.X + 60;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.5 + 115;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
-                    
+                        Constraint.RelativeToParent((parent) => parent.X + 60),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
                     MainLayout.Children.Add(RightButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width - 95;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.5 + 20;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.Width - 95),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
 
                     MainLayout.Children.Add(LeftButton,
-                        Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Width - 135;
-                        }), Constraint.RelativeToParent((parent) =>
-                        {
-                            return parent.Y + parent.Height * 0.5 + 115;
-                        }), Constraint.Constant(75), Constraint.Constant(75));
+                        Constraint.RelativeToParent((parent) => parent.Width - 135),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
                     ConnectToServer();
                 }
             }
@@ -233,6 +177,8 @@ namespace PiCar
 
             if (string.IsNullOrEmpty(server))
                 ShowSettingsPage();
+
+            StatusText.Text = "Connecting...";
 
             string html = "<html><head><style>" +
                           $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
@@ -307,7 +253,7 @@ namespace PiCar
             }
             catch
             {
-                StatusText.Text = "Not Connected to broker";
+                StatusText.Text = "Not Connected to a broker";
             }
         }
 
@@ -327,9 +273,6 @@ namespace PiCar
             Navigation.PushAsync(new SettingsPage(), true);
         }
 
-        private void MoveCar()
-        {
-            SendToMosquitto(movement.ToString());
-        }
+        private void MoveCar() => SendToMosquitto(movement.ToString());
     }
 }

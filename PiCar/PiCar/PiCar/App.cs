@@ -4,14 +4,12 @@ using XLabs.Serialization;
 
 namespace PiCar
 {
-	public partial class App : Application
+	public class App : Application
 	{
 		public App()
         {
             SetIoc();
-            MainPage = new NavigationPage(new AppPage())
-            {
-            };
+            MainPage = new NavigationPage(new AppPage());
 		}
 
 

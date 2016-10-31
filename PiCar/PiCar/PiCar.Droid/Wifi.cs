@@ -13,8 +13,8 @@ namespace PiCar.Droid
 
         public string GetSSID()
         {
-            var wifiManager = (WifiManager)(Android.App.Application.Context.GetSystemService(Context.WifiService));
-            var wifiInfo = wifiManager.ConnectionInfo;
+            WifiManager wifiManager = (WifiManager)(Android.App.Application.Context.GetSystemService(Context.WifiService));
+            WifiInfo wifiInfo = wifiManager.ConnectionInfo;
             return wifiInfo.SSID;
         }
     }

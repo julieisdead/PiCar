@@ -6,9 +6,6 @@ namespace PiCar.Droid
 {
     public class BaseUrl_Android : IBaseUrl
     {
-        public string Get()
-        {
-            return "file:///android_asset/";
-        }
+        public string Get() => "file:///android_asset/";
     }
 }
