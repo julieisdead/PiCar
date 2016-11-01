@@ -18,6 +18,7 @@ namespace PiCar
         {
             InitializeComponent();
             Title = "PiCar";
+
             CrossConnectivity.Current.ConnectivityChanged += ConnectivityChanged;
             CrossConnectivity.Current.ConnectivityTypeChanged += ConnectivityChanged;
         }
@@ -25,7 +26,7 @@ namespace PiCar
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            ConnectToServer();
+            Connect();
         }
 
         protected override void OnDisappearing()
@@ -116,7 +117,7 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    ConnectToServer();
+                    ConnectToCam();
                 }
                 else
                 {
@@ -160,12 +161,41 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    ConnectToServer();
+                    ConnectToCam();
                 }
             }
         }
 
-        public void ConnectToServer()
+        private void Connect()
+        {
+            ConnectToCam();
+            ConnectToBroker();
+        }
+
+        public void ConnectToCam()
+        {
+            Settings settings = Settings.LoadSettings();
+            IWifi wifi = new Wifi();
+
+            string server;
+            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"" && !string.IsNullOrEmpty(settings.LocalSSID))
+                server = settings.LocalServerName;
+            else server = settings.RemoteServerName;
+
+            if (string.IsNullOrEmpty(server))
+                ShowSettingsPage();
+
+            string html = "<html><head><style>" +
+              $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
+              "img  { width: 100%; } </style> </head><body>" +
+              $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = 'cam-unavailable.png'\" />" +
+              "</body></html>";
+
+            CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
+
+        }
+
+        private void ConnectToBroker()
         {
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
@@ -180,22 +210,10 @@ namespace PiCar
 
             Toaster("Connecting...");
 
-            string html = "<html><head><style>" +
-                          $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
-                          "img  { width: 100%; } </style> </head><body>" +
-                          $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = 'cam-unavailable.png'\" />" +
-                          "</body></html>";
-
-            CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
             string connectionString = $"tcp://{server}:{settings.MqttPort}";
-            ConnectMqtt(connectionString, settings.Username, settings.Password);
-        }
-
-        public void ConnectMqtt(string connectionString, string username, string password)
-        {
             try
             {
-                if (string.IsNullOrEmpty(username))
+                if (string.IsNullOrEmpty(settings.Username))
                 {
                     client = MqttClientFactory.CreateClient(connectionString,
                         Guid.NewGuid().ToString());
@@ -203,7 +221,7 @@ namespace PiCar
                 else
                 {
                     client = MqttClientFactory.CreateClient(connectionString,
-                        Guid.NewGuid().ToString(), username , password);
+                        Guid.NewGuid().ToString(), settings.Username, settings.Password);
                 }
                 client.Connected += client_Connected;
                 client.ConnectionLost += client_ConnectionLost;
@@ -212,13 +230,13 @@ namespace PiCar
             }
             catch
             {
-                //
+                Toaster("Failed to connect");
             }
         }
 
-        private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs args) => ConnectToServer();
+        private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs args) => Connect();
 
-        private void ConnectivityChanged(object sender, ConnectivityTypeChangedEventArgs args) => ConnectToServer();
+        private void ConnectivityChanged(object sender, ConnectivityTypeChangedEventArgs args) => Connect();
 
         public void SendToMosquitto(string value)
         {
@@ -242,8 +260,7 @@ namespace PiCar
             SendToMosquitto(movement.ToString());
         });
 
-        private static void client_ConnectionLost(object sender, EventArgs e)
-            => Device.BeginInvokeOnMainThread(() => Toaster("Client connection lost."));
+        private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client connection lost.");
 
         private void RegisterOurSubscriptions()
         {
