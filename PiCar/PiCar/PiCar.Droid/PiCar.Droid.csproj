@@ -181,9 +181,6 @@
     <AndroidResource Include="Resources\values\Strings.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\not-connected.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\drawable\ic_more_horiz_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +196,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\cam-unavailable.png" />
   </ItemGroup>
   <Import Project="..\PiCar\PiCar.projitems" Label="Shared" Condition="Exists('..\PiCar\PiCar.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

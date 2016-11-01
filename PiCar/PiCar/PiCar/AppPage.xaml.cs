@@ -183,7 +183,7 @@ namespace PiCar
             string html = "<html><head><style>" +
                           $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
                           "img  { width: 100%; } </style> </head><body>" +
-                          $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = 'not-connected.png'\" />" +
+                          $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = 'cam-unavailable.png'\" />" +
                           "</body></html>";
 
             CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
