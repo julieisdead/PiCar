@@ -35,7 +35,7 @@ namespace Plugin.Connectivity.Abstractions
         /// <param name="port">Port to attempt to check is reachable.</param>
         /// <param name="msTimeout">Timeout in milliseconds.</param>
         /// <returns></returns>
-        public abstract Task<bool> IsRemoteReachable(string host, int port = 80, int msTimeout = 5000);
+        public abstract bool IsRemoteReachable(string host, int port = 80, int msTimeout = 5000);
 
         /// <summary>
         /// Gets the list of all active connection types.

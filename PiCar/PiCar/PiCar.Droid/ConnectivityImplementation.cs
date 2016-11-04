@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Net;
@@ -121,9 +122,8 @@ namespace Plugin.Connectivity
         /// <param name="port">Port to attempt to check is reachable.</param>
         /// <param name="msTimeout">Timeout in milliseconds.</param>
         /// <returns></returns>
-        public override async Task<bool> IsRemoteReachable(string host, int port = 80, int msTimeout = 5000)
+        public override bool IsRemoteReachable(string host, int port = 80, int msTimeout = 5000)
         {
-
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
 
@@ -136,49 +136,47 @@ namespace Plugin.Connectivity
               Replace("https://", string.Empty).
               TrimEnd('/');
 
-            return await Task.Run(async () =>
+            try
             {
-                try
+                TaskCompletionSource<InetSocketAddress> tcs = new TaskCompletionSource<InetSocketAddress>();
+
+                Thread thread = new System.Threading.Thread(() =>
                 {
-                    var tcs = new TaskCompletionSource<InetSocketAddress>();
-                    new System.Threading.Thread(async () =>
-                    {
-                        /* this line can take minutes when on wifi with poor or none internet connectivity
+                    /* this line can take minutes when on wifi with poor or none internet connectivity
                         and Task.Delay solves it only if this is running on new thread (Task.Run does not help) */
-                        InetSocketAddress result = new InetSocketAddress(host, port);
+                    InetSocketAddress result = new InetSocketAddress(host, port);
 
-                        if (!tcs.Task.IsCompleted)
-                            tcs.TrySetResult(result);
+                    if (!tcs.Task.IsCompleted)
+                        tcs.TrySetResult(result);
 
-                    }).Start();
+                });
 
-                    Task.Run(async () =>
-                    {
-                        await Task.Delay(msTimeout);
-
-                        if (!tcs.Task.IsCompleted)
-                            tcs.TrySetResult(null);
-                    });
-
-                    var sockaddr = await tcs.Task;
-
-                    if (sockaddr == null)
-                        return false;
-
-                    using (var sock = new Socket())
-                    {
-
-                        await sock.ConnectAsync(sockaddr, msTimeout);
-                        return true;
-
-                    }
-                }
-                catch (Exception ex)
+                Task.Run(async () =>
                 {
-                    Debug.WriteLine("Unable to reach: " + host + " Error: " + ex);
+                    await Task.Delay(msTimeout);
+
+                    if (!tcs.Task.IsCompleted)
+                        tcs.TrySetResult(null);
+                });
+
+                InetSocketAddress sockaddr = tcs.Task.Result;
+
+                if (sockaddr == null)
                     return false;
+
+                using (Socket sock = new Socket())
+                {
+
+                    sock.Connect(sockaddr, msTimeout);
+                    return true;
                 }
-            });
+            }
+            catch
+                (Exception ex)
+            {
+                Debug.WriteLine("Unable to reach: " + host + " Error: " + ex);
+                return false;
+            }
         }
 
         /// <summary>
@@ -295,7 +293,5 @@ namespace Plugin.Connectivity
 
             base.Dispose(disposing);
         }
-
-
     }
 }
