@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using MqttLib;
 using PiCar.Droid;
-using Plugin.Connectivity;
-using Plugin.Connectivity.Abstractions;
 using Xamarin.Forms;
-using Random = System.Random;
 
 namespace PiCar
 {
@@ -21,14 +17,12 @@ namespace PiCar
             Title = "PiCar";
 
             movement = new Movement();
-            CrossConnectivity.Current.ConnectivityChanged += ConnectivityChanged;
-            CrossConnectivity.Current.ConnectivityTypeChanged += ConnectivityChanged;
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            StartConnectToAll();
+            Connect();
         }
 
         protected override void OnDisappearing()
@@ -81,6 +75,18 @@ namespace PiCar
                 {
                     NavigationPage.SetHasNavigationBar(this, false);
                     MainLayout.Children.Clear();
+                    
+                    MainLayout.Children.Add(LabelOne,
+                        Constraint.RelativeToParent((parent) => parent.X + parent.Width * 0.15),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - LabelOne.Height / 2),
+                        Constraint.RelativeToParent((parent) => parent.Width * 0.7),
+                        Constraint.Constant(LabelOne.Height));
+
+                    MainLayout.Children.Add(LabelTwo,
+                        Constraint.RelativeToParent((parent) => parent.X + parent.Width * 0.15),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 + LabelOne.Height / 2),
+                        Constraint.RelativeToParent((parent) => parent.Width * 0.7),
+                        Constraint.Constant(LabelTwo.Height));
 
                     //Car Cam View
                     MainLayout.Children.Add(CarCamView,
@@ -119,13 +125,23 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                  //  tokenSource.Cancel();
-                    StartConnectToAll();
                 }
                 else
                 {
                     NavigationPage.SetHasNavigationBar(this, true);
                     MainLayout.Children.Clear();
+
+                    MainLayout.Children.Add(LabelOne,
+                        Constraint.RelativeToParent((parent) => parent.X),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.25 - LabelOne.Height / 2),
+                        Constraint.RelativeToParent((parent) => parent.Width),
+                        Constraint.Constant(LabelOne.Height));
+
+                    MainLayout.Children.Add(LabelTwo,
+                        Constraint.RelativeToParent((parent) => parent.X),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.25 + LabelTwo.Height / 2),
+                        Constraint.RelativeToParent((parent) => parent.Width),
+                        Constraint.Constant(LabelTwo.Height));
 
                     // Car Cam View
                     MainLayout.Children.Add(CarCamView,
@@ -164,86 +180,62 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    //tokenSource.Cancel();
-                    StartConnectToAll();
                 }
             }
         }
 
-        private static bool connecting;
-
-        private void StartConnectToAll()
+        private async void Connect()
         {
-            if (connecting) return;
-            connecting = true;
-            bool cam = ConnectToCam();
-            bool mqtt = ConnectToBroker();
-            Toaster("Connecting...");
-            connecting = !(mqtt && cam);
-            if(!connecting) Toaster("Connected");
-            if (!connecting) return;
-
-            Device.StartTimer(TimeSpan.FromMilliseconds(10000), () =>
-            {
-                if (Settings.IsOpen) return true;
-                cam = ConnectToCam();
-                mqtt = ConnectToBroker();
-                Toaster("Connecting...");
-                System.Diagnostics.Debug.WriteLine("Lopper");
-                connecting = !(mqtt && cam);
-                if(!connecting) Toaster("Connected.");
-                return connecting;
-            });
+            ConnectToBroker();
+            await Task.Delay(TimeSpan.FromMilliseconds(1000));
+            ConnectToCam();
         }
 
-        private bool ConnectToCam()
+        private void ConnectToCam()
         {
+            if (client == null) return;
+            if (!client.IsConnected) return;
+            
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
 
-            string server;
-            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"" && !string.IsNullOrEmpty(settings.LocalSSID))
+            string server = string.Empty;
+            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"")
                 server = settings.LocalServerName;
             else server = settings.RemoteServerName;
 
             if (string.IsNullOrWhiteSpace(server))
             {
                 ShowSettingsPage();
-                return true;
+                return;
             }
 
-            bool camConnected = CrossConnectivity.Current.IsRemoteReachable(server, settings.CameraPort, 1250);
+            //bool canConnect = await CrossConnectivity.Current.IsRemoteReachable(server, settings.CameraPort);
 
             string html = "<html><head><style>" +
-              $"body {{ margin: 0px; padding: 0px; background-color: #263238; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
-              "img  { width: 100%; } </style> </head><body>" +
-              $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = ''\" />" +
-              "</body></html>";
-
-            if(camConnected)
-                CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
-
-            return camConnected;
+                $"body {{ margin: 0px; padding: 0px; background-color: transparent; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
+                "img  { width: 100%; } </style> </head><body>" +
+                $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
+                "</body></html>";
+            
+            CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
         }
 
-        private bool ConnectToBroker()
+        private void ConnectToBroker()
         {
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
 
-            string server;
-            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"" && !string.IsNullOrEmpty(settings.LocalSSID))
+            string server = string.Empty;
+            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"")
                 server = settings.LocalServerName;
             else server = settings.RemoteServerName;
 
-            if (string.IsNullOrEmpty(server))
+            if (string.IsNullOrWhiteSpace(server))
             {
                 ShowSettingsPage();
-                return true;
+                return;
             }
-
-            bool mqttConnected = CrossConnectivity.Current.IsRemoteReachable(server, settings.CameraPort, 1250);
-
             string connectionString = $"tcp://{server}:{settings.MqttPort}";
             try
             {
@@ -264,19 +256,8 @@ namespace PiCar
             }
             catch
             {
-                return false;
+                return;
             }
-            return mqttConnected;
-        }
-
-        private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs args)
-        {
-            StartConnectToAll();
-        }
-
-        private void ConnectivityChanged(object sender, ConnectivityTypeChangedEventArgs args)
-        {
-            StartConnectToAll();
         }
 
         private void SendToMosquitto(string value)
@@ -288,7 +269,7 @@ namespace PiCar
             }
             catch
             {
-                StartConnectToAll();
+                //
             }
         }
 
@@ -303,7 +284,6 @@ namespace PiCar
         private void client_ConnectionLost(object sender, EventArgs e)
         {
             Toaster("Client connection lost.");
-            StartConnectToAll();
         }
 
         private void RegisterOurSubscriptions()
@@ -331,6 +311,7 @@ namespace PiCar
         private void ShowSettingsPage()
         {
             if (Settings.IsOpen) return;
+            Settings.IsOpen = true;
             Navigation.PushAsync(new SettingsPage(), true);
         }
 

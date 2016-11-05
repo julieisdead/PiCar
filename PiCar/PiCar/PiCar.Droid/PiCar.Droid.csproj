@@ -150,8 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseUrl.cs" />
-    <Compile Include="ConnectivityChangeBroadcastReceiver.cs" />
-    <Compile Include="ConnectivityImplementation.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="CarButtonRenderer.cs" />
@@ -190,9 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidAsset Include="Assets\cam-unavailable.png" />
   </ItemGroup>
   <Import Project="..\PiCar\PiCar.projitems" Label="Shared" Condition="Exists('..\PiCar\PiCar.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

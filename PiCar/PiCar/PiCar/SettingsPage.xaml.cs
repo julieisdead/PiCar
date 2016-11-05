@@ -7,7 +7,7 @@ namespace PiCar
 	{
 		public SettingsPage ()
 		{
-			InitializeComponent ();
+		    InitializeComponent ();
 		    Settings settings = Settings.LoadSettings();
             NavigationPage.SetHasBackButton(this, false);
             BindingContext = settings;
@@ -18,11 +18,5 @@ namespace PiCar
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
-
-	    protected override void OnAppearing()
-        {
-            Settings.IsOpen = true;
-            base.OnAppearing();
-	    }
     }
 }

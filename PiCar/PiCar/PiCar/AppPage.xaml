@@ -21,6 +21,16 @@
   <ContentPage.Content>
     <RelativeLayout x:Name="MainLayout">
 
+        <Label x:Name="LabelOne"
+               Text="Not connected." 
+               HorizontalOptions="CenterAndExpand"
+               FontSize="18"/>
+      
+        <Label x:Name="LabelTwo"
+               Text="Pull to refresh." 
+               HorizontalOptions="CenterAndExpand"
+               FontSize="18"/>
+      
       <xlabs:HybridWebView x:Name="CarCamView"
                            BackgroundColor="Transparent"/>
 

@@ -16,10 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\CarButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Movement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\BaseConnectivity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\ConnectionType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\CrossConnectivity.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugin.Connectivity\IConnectivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\IPersistentMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MessageFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttAcknowledgeMessage.cs" />
