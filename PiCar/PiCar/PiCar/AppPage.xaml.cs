@@ -14,9 +14,7 @@ namespace PiCar
         private IMqtt client;
         private ICommand refreshCommand;
 
-        public ICommand RefreshCommand
-            => refreshCommand ?? (refreshCommand = new Command(async ()
-                => await ExecuteRefreshCommand()));
+        public ICommand RefreshCommand => refreshCommand ?? (refreshCommand = new Command(ExecuteRefreshCommand));
 
         public AppPage()
         {
@@ -26,10 +24,10 @@ namespace PiCar
             movement = new Movement();
         }
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
             base.OnAppearing();
-            await Connect();
+            Connect();
         }
 
         protected override void OnDisappearing()
@@ -71,7 +69,7 @@ namespace PiCar
 
         private double pageWidth;
         private double pageHeight;
-        protected override async void OnSizeAllocated(double newWidth, double newHeight)
+        protected override void OnSizeAllocated(double newWidth, double newHeight)
         {
             base.OnSizeAllocated(newWidth, newHeight);
             if (Math.Abs(newWidth - pageWidth) > 0 || Math.Abs(newHeight - pageHeight) > 0)
@@ -128,7 +126,7 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    await Connect();
+                    Connect();
                 }
                 else
                 {
@@ -178,32 +176,28 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    await Connect();
+                    Connect();
                 }
             }
         }
 
-        private async Task ExecuteRefreshCommand()
+        private void ExecuteRefreshCommand()
         {
             if (CamPullLayout.IsRefreshing)
                 return;
             CamPullLayout.IsRefreshing = true;
-            await Connect();
+            Connect();
             CamPullLayout.IsRefreshing = false;
         }
 
-        private async Task Connect()
+        private void Connect()
         {
             ConnectToBroker();
-            await Task.Delay(TimeSpan.FromMilliseconds(1000));
             ConnectToCam();
         }
 
         private void ConnectToCam()
         {
-            if (client == null) return;
-            if (!client.IsConnected) return;
-
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
 
@@ -218,10 +212,13 @@ namespace PiCar
             }
 
             string html = "<html><head><style>" +
-                $"body {{ margin: 0px; padding: 0px; background-color: transparent; Width: {CamWebView.Width}px; Height: {CamWebView.Height}px;}} " +
-                "img  { width: 100%; position: absolute; top 0; left 0; } </style> </head><body>" +
-                $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
-                "</body></html>";
+                          $"body{{Width:{CamWebView.Width - 16}px;Height:{CamWebView.Height- 16}px;}}" +
+                          $".loader{{left:{CamWebView.Width/2 - 8};margin:{CamWebView.Height/2 - 46}px auto;position:fixed;}}" +
+                          $"img{{width:{CamWebView.Width - 16};height:{CamWebView.Height - 16};position:fixed;}}" +
+                          "</style><link rel=\"stylesheet\" type=\"text/css\" href=\"car-cam.css\" /></head><body>" +
+                          "<div class=\"loader\">Loading...</div>" +
+                          $"<img class=\"camview\" src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
+                          "</body></html>";
 
             CamWebView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
         }

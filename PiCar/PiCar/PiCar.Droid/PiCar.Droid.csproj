@@ -198,7 +198,7 @@
     <AndroidResource Include="Resources\drawable\Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\cam-loading.png" />
+    <AndroidAsset Include="Assets\car-cam.css" />
   </ItemGroup>
   <Import Project="..\PiCar\PiCar.projitems" Label="Shared" Condition="Exists('..\PiCar\PiCar.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
