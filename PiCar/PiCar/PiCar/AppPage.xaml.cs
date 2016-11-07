@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using MqttLib;
 using PiCar.Droid;
+using Refractored.XamForms.PullToRefresh;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -10,6 +12,11 @@ namespace PiCar
     {
         private Movement movement;
         private IMqtt client;
+        private ICommand refreshCommand;
+
+        public ICommand RefreshCommand
+            => refreshCommand ?? (refreshCommand = new Command(async ()
+                => await ExecuteRefreshCommand()));
 
         public AppPage()
         {
@@ -19,10 +26,10 @@ namespace PiCar
             movement = new Movement();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            Connect();
+            await Connect();
         }
 
         protected override void OnDisappearing()
@@ -64,32 +71,28 @@ namespace PiCar
 
         private double pageWidth;
         private double pageHeight;
-        protected override void OnSizeAllocated(double newWidth, double newHeight)
+        protected override async void OnSizeAllocated(double newWidth, double newHeight)
         {
             base.OnSizeAllocated(newWidth, newHeight);
             if (Math.Abs(newWidth - pageWidth) > 0 || Math.Abs(newHeight - pageHeight) > 0)
             {
                 pageWidth = newWidth;
                 pageHeight = newHeight;
+                CamPullLayout.RefreshCommand = RefreshCommand;
+
                 if (newWidth > newHeight)
                 {
                     NavigationPage.SetHasNavigationBar(this, false);
                     MainLayout.Children.Clear();
-                    
-                    MainLayout.Children.Add(LabelOne,
-                        Constraint.RelativeToParent((parent) => parent.X + parent.Width * 0.15),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - LabelOne.Height / 2),
-                        Constraint.RelativeToParent((parent) => parent.Width * 0.7),
-                        Constraint.Constant(LabelOne.Height));
 
-                    MainLayout.Children.Add(LabelTwo,
-                        Constraint.RelativeToParent((parent) => parent.X + parent.Width * 0.15),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 + LabelOne.Height / 2),
-                        Constraint.RelativeToParent((parent) => parent.Width * 0.7),
-                        Constraint.Constant(LabelTwo.Height));
+                    CamPullLayout = new PullToRefreshLayout
+                    {
+                        Content = CamScrollView,
+                        RefreshCommand = RefreshCommand
+                    };
 
                     //Car Cam View
-                    MainLayout.Children.Add(CarCamView,
+                    MainLayout.Children.Add(CamPullLayout,
                         Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15),
                         Constraint.RelativeToParent((parent) => parent.Y),
                         Constraint.RelativeToParent((parent) => parent.Width*0.7),
@@ -125,26 +128,21 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
+                    await Connect();
                 }
                 else
                 {
                     NavigationPage.SetHasNavigationBar(this, true);
                     MainLayout.Children.Clear();
 
-                    MainLayout.Children.Add(LabelOne,
-                        Constraint.RelativeToParent((parent) => parent.X),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.25 - LabelOne.Height / 2),
-                        Constraint.RelativeToParent((parent) => parent.Width),
-                        Constraint.Constant(LabelOne.Height));
-
-                    MainLayout.Children.Add(LabelTwo,
-                        Constraint.RelativeToParent((parent) => parent.X),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.25 + LabelTwo.Height / 2),
-                        Constraint.RelativeToParent((parent) => parent.Width),
-                        Constraint.Constant(LabelTwo.Height));
+                    CamPullLayout = new PullToRefreshLayout
+                    {
+                        Content = CamScrollView,
+                        RefreshCommand = RefreshCommand
+                    };
 
                     // Car Cam View
-                    MainLayout.Children.Add(CarCamView,
+                    MainLayout.Children.Add(CamPullLayout,
                         Constraint.RelativeToParent((parent) => parent.X),
                         Constraint.RelativeToParent((parent) => parent.Y),
                         Constraint.RelativeToParent((parent) => parent.Width),
@@ -180,11 +178,21 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
+                    await Connect();
                 }
             }
         }
 
-        private async void Connect()
+        private async Task ExecuteRefreshCommand()
+        {
+            if (CamPullLayout.IsRefreshing)
+                return;
+            CamPullLayout.IsRefreshing = true;
+            await Connect();
+            CamPullLayout.IsRefreshing = false;
+        }
+
+        private async Task Connect()
         {
             ConnectToBroker();
             await Task.Delay(TimeSpan.FromMilliseconds(1000));
@@ -195,14 +203,13 @@ namespace PiCar
         {
             if (client == null) return;
             if (!client.IsConnected) return;
-            
+
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
 
-            string server = string.Empty;
-            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"")
-                server = settings.LocalServerName;
-            else server = settings.RemoteServerName;
+            string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
+                ? settings.LocalServerName
+                : settings.RemoteServerName;
 
             if (string.IsNullOrWhiteSpace(server))
             {
@@ -210,15 +217,13 @@ namespace PiCar
                 return;
             }
 
-            //bool canConnect = await CrossConnectivity.Current.IsRemoteReachable(server, settings.CameraPort);
-
             string html = "<html><head><style>" +
-                $"body {{ margin: 0px; padding: 0px; background-color: transparent; Width: {CarCamView.Width}px; Height: {CarCamView.Height}px;}} " +
-                "img  { width: 100%; } </style> </head><body>" +
+                $"body {{ margin: 0px; padding: 0px; background-color: transparent; Width: {CamWebView.Width}px; Height: {CamWebView.Height}px;}} " +
+                "img  { width: 100%; position: absolute; top 0; left 0; } </style> </head><body>" +
                 $"<img src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
                 "</body></html>";
-            
-            CarCamView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
+
+            CamWebView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
         }
 
         private void ConnectToBroker()
@@ -226,10 +231,9 @@ namespace PiCar
             Settings settings = Settings.LoadSettings();
             IWifi wifi = new Wifi();
 
-            string server = string.Empty;
-            if (wifi.GetSSID() == $"\"{settings.LocalSSID}\"")
-                server = settings.LocalServerName;
-            else server = settings.RemoteServerName;
+            string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
+                ? settings.LocalServerName
+                : settings.RemoteServerName;
 
             if (string.IsNullOrWhiteSpace(server))
             {
@@ -256,7 +260,7 @@ namespace PiCar
             }
             catch
             {
-                return;
+                //
             }
         }
 
@@ -281,10 +285,7 @@ namespace PiCar
             SendToMosquitto(movement.ToString());
         });
 
-        private void client_ConnectionLost(object sender, EventArgs e)
-        {
-            Toaster("Client connection lost.");
-        }
+        private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client connection lost.");
 
         private void RegisterOurSubscriptions()
         {

@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.OS;
+using Refractored.XamForms.PullToRefresh.Droid;
 using Xamarin.Forms;
 using XLabs.Forms;
 
@@ -12,6 +13,7 @@ namespace PiCar.Droid
 		{
             base.OnCreate (bundle);
             Forms.Init(this, bundle);
+            PullToRefreshLayoutRenderer.Init();
             LoadApplication(new App());
 		}
 	}

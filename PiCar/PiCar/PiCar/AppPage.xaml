@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:xlabs="clr-namespace:XLabs.Forms.Controls;assembly=XLabs.Forms"
+             xmlns:controls="clr-namespace:Refractored.XamForms.PullToRefresh;assembly=Refractored.XamForms.PullToRefresh"
              xmlns:local="clr-namespace:PiCar;assembly=PiCar"
              x:Class="PiCar.AppPage">
   <ContentPage.Resources>
@@ -20,24 +21,32 @@
 
   <ContentPage.Content>
     <RelativeLayout x:Name="MainLayout">
+      <controls:PullToRefreshLayout x:Name="CamPullLayout"
+                                    IsPullToRefreshEnabled="True"
+                                    RefreshColor="White">
 
-        <Label x:Name="LabelOne"
-               Text="Not connected." 
-               HorizontalOptions="CenterAndExpand"
-               FontSize="18"/>
-      
-        <Label x:Name="LabelTwo"
-               Text="Pull to refresh." 
-               HorizontalOptions="CenterAndExpand"
-               FontSize="18"/>
-      
-      <xlabs:HybridWebView x:Name="CarCamView"
-                           BackgroundColor="Transparent"/>
+        <ScrollView x:Name="CamScrollView"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+
+          <RelativeLayout HorizontalOptions="FillAndExpand"
+                          VerticalOptions="FillAndExpand">
+
+            <xlabs:HybridWebView x:Name="CamWebView"
+                                 BackgroundColor="Transparent"
+                                 RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=0}"
+                                 RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0}"
+                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"/>
+
+          </RelativeLayout>
+        </ScrollView>
+      </controls:PullToRefreshLayout>
 
       <Label x:Name="StatusText"
              TextColor="#ECEFF1"
              FontSize="18"/>
-      
+
       <local:CarButton x:Name="ForwardButton"
                        Text="Forward"
                        Touched="OnForwardTouched"

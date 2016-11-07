@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using Refractored.XamForms.PullToRefresh.Droid;
+using Xamarin.Forms;
 using XLabs.Ioc;
 using XLabs.Serialization;
 
@@ -8,6 +9,7 @@ namespace PiCar
 	{
 		public App()
         {
+		    PullToRefreshLayoutRenderer.Init();
             SetIoc();
             MainPage = new NavigationPage(new AppPage());
 		}
