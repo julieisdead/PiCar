@@ -253,7 +253,7 @@ namespace PiCar
                 client.Connected += client_Connected;
                 client.ConnectionLost += client_ConnectionLost;
                 client.PublishArrived += client_PublishArrived;
-                Task.Run(() => client.Connect(true));
+                Task.Run(() => client.Connect("car/REQUEST", QoS.BestEfforts, new Movement().ToString(), false, true));
             }
             catch
             {
