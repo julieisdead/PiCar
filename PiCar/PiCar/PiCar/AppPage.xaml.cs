@@ -253,7 +253,10 @@ namespace PiCar
                 client.Connected += client_Connected;
                 client.ConnectionLost += client_ConnectionLost;
                 client.PublishArrived += client_PublishArrived;
-                Task.Run(() => client.Connect("car/REQUEST", QoS.BestEfforts, new Movement().ToString(), false, true));
+                Task.Run(
+                    () =>
+                        client.Connect("car/DISCONNECT", QoS.BestEfforts,
+                            XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, false, true));
             }
             catch
             {
@@ -280,6 +283,7 @@ namespace PiCar
 
             movement = new Movement();
             SendToMosquitto(movement.ToString());
+            client.Publish("car/CONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, QoS.BestEfforts, false);
         });
 
         private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client connection lost.");
