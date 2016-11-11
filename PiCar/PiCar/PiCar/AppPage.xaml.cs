@@ -11,7 +11,7 @@ namespace PiCar
     public partial class AppPage : ContentPage
     {
         private Movement movement;
-        private IMqtt client;
+        private static IMqtt client;
         private ICommand refreshCommand;
 
         public ICommand RefreshCommand => refreshCommand ?? (refreshCommand = new Command(ExecuteRefreshCommand));
@@ -126,7 +126,7 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    Connect();
+                    ConnectToCam();
                 }
                 else
                 {
@@ -176,7 +176,7 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    Connect();
+                    ConnectToCam();
                 }
             }
         }
@@ -255,7 +255,7 @@ namespace PiCar
                 client.PublishArrived += client_PublishArrived;
                 Task.Run(
                     () =>
-                        client.Connect("car/DISCONNECT", QoS.BestEfforts,
+                        client.Connect("car/DISCONNECT", QoS.AtLeastOnce,
                             XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, false, true));
             }
             catch
@@ -264,12 +264,25 @@ namespace PiCar
             }
         }
 
-        private void SendToMosquitto(string value)
+        private static void SendToMosquitto(string value)
         {
             try
             {
                 MqttPayload payload = new MqttPayload(value);
-                client.Publish("car/REQUEST", payload, QoS.BestEfforts, false);
+                client.Publish("car/REQUEST", payload, QoS.AtLeastOnce, false);
+            }
+            catch
+            {
+                //
+            }
+        }
+
+        public static void SendRestartCommand()
+        {
+            try
+            {
+                MqttPayload paylod = new MqttPayload("1");
+                client.Publish("cam/RESTART", paylod, QoS.AtLeastOnce, false);
             }
             catch
             {
@@ -286,13 +299,15 @@ namespace PiCar
             client.Publish("car/CONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, QoS.BestEfforts, false);
         });
 
-        private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client connection lost.");
+        private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client disconnected");
 
-        private void RegisterOurSubscriptions()
+        private static void RegisterOurSubscriptions()
         {
             try
             {
                 client.Subscribe("car/RESPOND", QoS.BestEfforts);
+                client.Subscribe("car/RECONCAM", QoS.BestEfforts);
+                client.Subscribe("car/STATE", QoS.BestEfforts);
             }
             catch
             {
@@ -305,7 +320,17 @@ namespace PiCar
             Device.BeginInvokeOnMainThread(() =>
             {
                 string response = e.Payload.ToString();
-                StatusText.Text = response;
+                switch (e.Topic) {
+                    case "car/RECONCAM":
+                        ConnectToCam();
+                        return;
+                    case "car/STATE":
+                        StatusText.Text = response;
+                        return;
+                    case "car/RESPOND":
+                        Toaster(response);
+                        break;
+                }
             });
             return true;
         }

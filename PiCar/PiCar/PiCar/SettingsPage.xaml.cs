@@ -18,5 +18,7 @@ namespace PiCar
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
-    }
+
+	    private void Restart_OnClicked(object sender, EventArgs e) => AppPage.SendRestartCommand();
+	}
 }

@@ -83,6 +83,10 @@
                  HorizontalOptions="FillAndExpand"/>
         </StackLayout>
 
+        <Button Text="Restart Camera"
+                HorizontalOptions="FillAndExpand"
+                Clicked="Restart_OnClicked"/>
+
       </StackLayout>
     </ScrollView>
   </ContentPage.Content>
