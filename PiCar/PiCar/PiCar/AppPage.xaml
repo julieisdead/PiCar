@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:xlabs="clr-namespace:XLabs.Forms.Controls;assembly=XLabs.Forms"
-             xmlns:controls="clr-namespace:Refractored.XamForms.PullToRefresh;assembly=Refractored.XamForms.PullToRefresh"
              xmlns:local="clr-namespace:PiCar;assembly=PiCar"
              x:Class="PiCar.AppPage">
   <ContentPage.Resources>
@@ -16,32 +15,38 @@
         <Setter Property="Opacity" Value="0.25" />
       </Style>
 
+      <Style x:Key="ToolbarItem" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="Margin" Value="0"/>
+      </Style>
+
     </ResourceDictionary>
   </ContentPage.Resources>
 
   <ContentPage.Content>
     <RelativeLayout x:Name="MainLayout">
-      <controls:PullToRefreshLayout x:Name="CamPullLayout"
-                                    IsPullToRefreshEnabled="True"
-                                    RefreshColor="White">
 
-        <ScrollView x:Name="CamScrollView"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand">
+      <RelativeLayout x:Name="FakeToolbar"
+                   BackgroundColor="#607D8B">
 
-          <RelativeLayout HorizontalOptions="FillAndExpand"
-                          VerticalOptions="FillAndExpand">
+        <Picker x:Name="Servers"
+                SelectedIndexChanged="ServersChanged"/>
 
-            <xlabs:HybridWebView x:Name="CamWebView"
-                                 BackgroundColor="Transparent"
-                                 RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=0}"
-                                 RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0}"
-                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"/>
+        <Button x:Name="RefreshButton" 
+                Text="Refresh"
+                Style="{StaticResource ToolbarItem}"
+                Clicked="RefreshClicked"/>
+        
+        <Button x:Name="EditButton"
+                Text="Edit"
+                Style="{StaticResource ToolbarItem}"
+                Clicked="EditClicked"/>
 
-          </RelativeLayout>
-        </ScrollView>
-      </controls:PullToRefreshLayout>
+      </RelativeLayout>
+      
+      <xlabs:HybridWebView x:Name="CamWebView"
+                           BackgroundColor="Transparent"/>
 
       <Label x:Name="StatusText"
              TextColor="#ECEFF1"
@@ -69,12 +74,4 @@
 
     </RelativeLayout>
   </ContentPage.Content>
-
-  <ContentPage.ToolbarItems>
-    <ToolbarItem Text="More"
-                 Order="Primary"
-                 Icon="ic_more_horiz_white_24dp.png"
-                 Clicked="SettingsClicked"/>
-
-  </ContentPage.ToolbarItems>
 </ContentPage>

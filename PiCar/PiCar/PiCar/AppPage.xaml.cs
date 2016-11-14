@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using MqttLib;
 using PiCar.Droid;
-using Refractored.XamForms.PullToRefresh;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -12,9 +11,6 @@ namespace PiCar
     {
         private Movement movement;
         private static IMqtt client;
-        private ICommand refreshCommand;
-
-        public ICommand RefreshCommand => refreshCommand ?? (refreshCommand = new Command(ExecuteRefreshCommand));
 
         public AppPage()
         {
@@ -27,6 +23,12 @@ namespace PiCar
         protected override void OnAppearing()
         {
             base.OnAppearing();
+            List<string> servers = Settings.GetServers();
+            Servers.Items.Clear();
+            foreach (string item in servers)
+                Servers.Items.Add(item);
+            if (Servers.Items.Count > 0)
+                Servers.SelectedIndex = 0;
             Connect();
         }
 
@@ -37,26 +39,34 @@ namespace PiCar
             SendToMosquitto(movement.ToString());
         }
 
-        private void SettingsClicked(object sender, EventArgs e) => ShowSettingsPage();
+        private void EditClicked(object sender, EventArgs e) => ShowSettingsPage();
+
+        private void RefreshClicked(object sender, EventArgs e) => Connect();
+
+        private void ServersChanged(object sender, EventArgs e)
+        {
+            if(Servers.SelectedIndex >= 0)
+                Connect();
+        }
 
         private void OnForwardTouched(object sender, EventArgs e)
         {
             if (movement.Reverse) return;
-            movement.Forward = ((CarButton)sender).State == CarButtonState.Down;
+            movement.Forward = ((CarButton) sender).State == CarButtonState.Down;
             MoveCar();
         }
 
         private void OnReverseTouched(object sender, EventArgs e)
         {
             if (movement.Forward) return;
-            movement.Reverse = ((CarButton)sender).State == CarButtonState.Down;
+            movement.Reverse = ((CarButton) sender).State == CarButtonState.Down;
             MoveCar();
         }
 
         private void OnLeftTouched(object sender, EventArgs e)
         {
             if (movement.Right) return;
-            movement.Left = ((CarButton)sender).State == CarButtonState.Down;
+            movement.Left = ((CarButton) sender).State == CarButtonState.Down;
             MoveCar();
         }
 
@@ -69,6 +79,7 @@ namespace PiCar
 
         private double pageWidth;
         private double pageHeight;
+
         protected override void OnSizeAllocated(double newWidth, double newHeight)
         {
             base.OnSizeAllocated(newWidth, newHeight);
@@ -76,21 +87,13 @@ namespace PiCar
             {
                 pageWidth = newWidth;
                 pageHeight = newHeight;
-                CamPullLayout.RefreshCommand = RefreshCommand;
-
                 if (newWidth > newHeight)
                 {
                     NavigationPage.SetHasNavigationBar(this, false);
                     MainLayout.Children.Clear();
 
-                    CamPullLayout = new PullToRefreshLayout
-                    {
-                        Content = CamScrollView,
-                        RefreshCommand = RefreshCommand
-                    };
-
                     //Car Cam View
-                    MainLayout.Children.Add(CamPullLayout,
+                    MainLayout.Children.Add(CamWebView,
                         Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15),
                         Constraint.RelativeToParent((parent) => parent.Y),
                         Constraint.RelativeToParent((parent) => parent.Width*0.7),
@@ -126,68 +129,74 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    ConnectToCam();
                 }
                 else
                 {
-                    NavigationPage.SetHasNavigationBar(this, true);
+                    NavigationPage.SetHasNavigationBar(this, false);
                     MainLayout.Children.Clear();
 
-                    CamPullLayout = new PullToRefreshLayout
-                    {
-                        Content = CamScrollView,
-                        RefreshCommand = RefreshCommand
-                    };
+                    MainLayout.Children.Add(FakeToolbar,
+                        Constraint.Constant(0),
+                        Constraint.Constant(0),
+                        Constraint.RelativeToParent((parent) => parent.Width),
+                        Constraint.Constant(50));
+
+                    FakeToolbar.Children.Clear();
+                    FakeToolbar.Children.Add(Servers,
+                        Constraint.RelativeToParent((parent) => parent.X + 10),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - Servers.Height * 0.5),
+                        Constraint.RelativeToParent((parent) => parent.Width * 0.5));
+
+                    FakeToolbar.Children.Add(EditButton, 
+                        Constraint.RelativeToParent((parent) => parent.Width - 60),
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - EditButton.Height * 0.5),
+                        Constraint.Constant(55));
+
+                    FakeToolbar.Children.Add(RefreshButton,
+                        Constraint.RelativeToParent((parent) => parent.Width - 145),
+                        Constraint.RelativeToParent((parent)=> parent.Height * 0.5 - RefreshButton.Height * 0.5),
+                        Constraint.Constant(85));
 
                     // Car Cam View
-                    MainLayout.Children.Add(CamPullLayout,
+                    MainLayout.Children.Add(CamWebView,
                         Constraint.RelativeToParent((parent) => parent.X),
-                        Constraint.RelativeToParent((parent) => parent.Y),
+                        Constraint.RelativeToParent((parent) => parent.Y + 50),
                         Constraint.RelativeToParent((parent) => parent.Width),
                         Constraint.RelativeToParent((parent) => parent.Height*0.5));
 
                     // StatusText
                     MainLayout.Children.Add(StatusText,
                         Constraint.RelativeToParent((parent) => parent.X + 20),
-                        Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5),
+                        Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5 + 50),
                         Constraint.RelativeToParent((parent) => parent.Width),
                         Constraint.Constant(StatusText.Height));
 
                     MainLayout.Children.Add(ForwardButton,
                         Constraint.RelativeToParent((parent) => parent.X + 20),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
 
                     MainLayout.Children.Add(ReverseButton,
                         Constraint.RelativeToParent((parent) => parent.X + 60),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
 
                     MainLayout.Children.Add(RightButton,
                         Constraint.RelativeToParent((parent) => parent.Width - 95),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
 
                     MainLayout.Children.Add(LeftButton,
                         Constraint.RelativeToParent((parent) => parent.Width - 135),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 115),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
                         Constraint.Constant(75),
                         Constraint.Constant(75));
-                    ConnectToCam();
                 }
+                ConnectToCam();
             }
-        }
-
-        private void ExecuteRefreshCommand()
-        {
-            if (CamPullLayout.IsRefreshing)
-                return;
-            CamPullLayout.IsRefreshing = true;
-            Connect();
-            CamPullLayout.IsRefreshing = false;
         }
 
         private void Connect()
@@ -198,7 +207,13 @@ namespace PiCar
 
         private void ConnectToCam()
         {
-            Server settings = Server.LoadSettings();
+            if (Servers.SelectedIndex < 0)
+            {
+                ShowSettingsPage();
+                return;
+            }
+
+            Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
             IWifi wifi = new Wifi();
 
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
@@ -212,7 +227,7 @@ namespace PiCar
             }
 
             string html = "<html><head><style>" +
-                          $"body{{Width:{CamWebView.Width - 16}px;Height:{CamWebView.Height- 16}px;}}" +
+                          $"body{{Width:{CamWebView.Width - 16}px;Height:{CamWebView.Height - 16}px;}}" +
                           $".loader{{left:{CamWebView.Width/2 - 8};margin:{CamWebView.Height/2 - 46}px auto;position:fixed;}}" +
                           $"img{{width:{CamWebView.Width - 16};height:{CamWebView.Height - 16};position:fixed;}}" +
                           "</style><link rel=\"stylesheet\" type=\"text/css\" href=\"car-cam.css\" /></head><body>" +
@@ -225,18 +240,23 @@ namespace PiCar
 
         private void ConnectToBroker()
         {
-            Server settings = Server.LoadSettings();
+            if (Servers.SelectedIndex < 0)
+            {
+                ShowSettingsPage();
+                return;
+            }
+            Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
             IWifi wifi = new Wifi();
 
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
 
-            if (string.IsNullOrWhiteSpace(server))
-            {
-                ShowSettingsPage();
-                return;
-            }
+                     if (string.IsNullOrWhiteSpace(server))
+                     {
+                         ShowSettingsPage();
+                         return;
+                     }
             string connectionString = $"tcp://{server}:{settings.MqttPort}";
             try
             {
@@ -320,7 +340,8 @@ namespace PiCar
             Device.BeginInvokeOnMainThread(() =>
             {
                 string response = e.Payload.ToString();
-                switch (e.Topic) {
+                switch (e.Topic)
+                {
                     case "car/RECONCAM":
                         ConnectToCam();
                         return;
@@ -337,9 +358,13 @@ namespace PiCar
 
         private void ShowSettingsPage()
         {
-            if (Server.IsOpen) return;
-            Server.IsOpen = true;
-            Navigation.PushAsync(new ServerPage(), true);
+            if (Settings.IsOpen) return;
+            Settings.IsOpen = true;
+            string server = string.Empty;
+            if(Servers.SelectedIndex >= 0)
+                if (Servers.Items.Count > 0)
+                    server = Servers.Items[Servers.SelectedIndex];
+            Navigation.PushAsync(new SettingsPage(server), true);
         }
 
         private void MoveCar() => SendToMosquitto(movement.ToString());

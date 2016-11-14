@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PiCar.SettingsPage"
+             Icon="hamburger.png"
+             Title="PiCar">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+
+      <Style x:Key="ToolbarItem" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="TextColor" Value="#ECEFF1" />
+        <Setter Property="Margin" Value="0" />
+      </Style>
+
+    </ResourceDictionary>
+  </ContentPage.Resources>
+  
+  <ContentPage.Content>
+
+    <StackLayout>
+      
+      <RelativeLayout BackgroundColor="#607D8B"
+                      HorizontalOptions="FillAndExpand"
+                      VerticalOptions="Start"
+                      HeightRequest="50">
+
+          <Button x:Name="SaveButton"
+                  Text="Save"
+                  Style="{StaticResource ToolbarItem}"
+                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1, Constant=-65}"
+                  RelativeLayout.WidthConstraint="{ConstraintExpression Type=Constant, Constant=60}"
+                  Clicked="SaveClick"/>
+
+        <Button x:Name="AddButton"
+                  Text="Add"
+                Style="{StaticResource ToolbarItem}"
+                RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=SaveButton, Property=X, Factor=1, Constant=-60}"
+                RelativeLayout.WidthConstraint="{ConstraintExpression Type=Constant, Constant=60}"
+                Clicked="AddClick"/>
+        
+          <Button Text="Delete"
+                  Style="{StaticResource ToolbarItem}"
+                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=AddButton, Property=X, Factor=1, Constant=-75}"
+                  RelativeLayout.WidthConstraint="{ConstraintExpression Type=Constant, Constant=75}"
+                  Clicked="DeleteClick"/>
+
+        </RelativeLayout>
+    
+    <ScrollView>
+
+
+      <StackLayout Padding="30"
+                   Spacing="10"
+                   VerticalOptions="Fill">
+
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Server Name"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding Name, Mode=TwoWay}"
+                 Keyboard="Default"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+        
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Remote Server"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding RemoteServerName, Mode=TwoWay}"
+                 Keyboard="Url"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Local Wifi"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding LocalSSID, Mode=TwoWay}"
+                 Keyboard="Default"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Local Server"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding LocalServerName, Mode=TwoWay}"
+                 Keyboard="Url"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Username"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding Username, Mode=TwoWay}"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Password"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding Password, Mode=TwoWay}"
+                 IsPassword="True"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+          
+        <StackLayout Orientation="Horizontal">
+          <Label Text="MQTT Port"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding MqttPort, Mode=TwoWay}"
+                 Keyboard="Numeric"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <StackLayout Orientation="Horizontal">
+          <Label Text="Camera Port"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
+
+          <Entry Text="{Binding CameraPort, Mode=TwoWay}"
+                 Keyboard="Numeric"
+                 HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+        
+      </StackLayout>
+    </ScrollView>
+    </StackLayout>
+  </ContentPage.Content>
+
+</ContentPage>

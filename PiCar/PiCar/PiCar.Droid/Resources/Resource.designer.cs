@@ -5553,9 +5553,6 @@ namespace PiCar
 			// aapt resource value: 0x7f0a010d
 			public const int Theme_AppCompat_NoActionBar = 2131362061;
 			
-			// aapt resource value: 0x7f0a0176
-			public const int Theme_Car = 2131362166;
-			
 			// aapt resource value: 0x7f0a0163
 			public const int Theme_Design = 2131362147;
 			
@@ -5585,6 +5582,9 @@ namespace PiCar
 			
 			// aapt resource value: 0x7f0a0003
 			public const int Theme_MediaRouter_LightControlPanel = 2131361795;
+			
+			// aapt resource value: 0x7f0a0176
+			public const int Theme_Splash = 2131362166;
 			
 			// aapt resource value: 0x7f0a010e
 			public const int ThemeOverlay_AppCompat = 2131362062;
