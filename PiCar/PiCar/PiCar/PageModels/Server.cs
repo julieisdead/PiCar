@@ -4,11 +4,11 @@ using Plugin.Settings.Abstractions;
 
 namespace PiCar
 {
-    public class Settings
+    public class Server
     {
         private const string SettingsKey = "4db3669d-2162-4eb1-86a9-20a063997745";
 
-        public Settings()
+        public Server()
         {
             _remoteServer = string.Empty;
             _localSSID = string.Empty;
@@ -19,10 +19,10 @@ namespace PiCar
             _cameraPort = 8081;
         }
 
-        public static Settings LoadSettings()
+        public static Server LoadSettings()
         {
-            string settings = AppSettings.GetValueOrDefault(SettingsKey, new Settings().ToString());
-            return JsonConvert.DeserializeObject<Settings>(settings);
+            string settings = AppSettings.GetValueOrDefault(SettingsKey, new Server().ToString());
+            return JsonConvert.DeserializeObject<Server>(settings);
         }
 
         public static bool IsOpen { get; set; }

@@ -68,17 +68,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttPayload.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\PublishArrivedArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\QoS.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SettingsPage.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)ServerPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)PageModels\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PageModels\Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)AppPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <None Include="$(MSBuildThisFileDirectory)MqttLib\MqttLib_Key.snk" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)SettingsPage.xaml">
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)ServerPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

@@ -3,19 +3,19 @@ using Xamarin.Forms;
 
 namespace PiCar
 {
-	public partial class SettingsPage : ContentPage
+	public partial class ServerPage : ContentPage
 	{
-		public SettingsPage ()
+		public ServerPage()
 		{
 		    InitializeComponent ();
-		    Settings settings = Settings.LoadSettings();
+            Server settings = Server.LoadSettings();
             NavigationPage.SetHasBackButton(this, false);
             BindingContext = settings;
 		}
 
         private void BackClick(object sender, EventArgs e)
         {
-            Settings.IsOpen = false;
+            Server.IsOpen = false;
             Navigation.PopAsync(true);
         }
 

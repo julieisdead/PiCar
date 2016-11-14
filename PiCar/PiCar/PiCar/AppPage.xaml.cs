@@ -198,7 +198,7 @@ namespace PiCar
 
         private void ConnectToCam()
         {
-            Settings settings = Settings.LoadSettings();
+            Server settings = Server.LoadSettings();
             IWifi wifi = new Wifi();
 
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
@@ -225,7 +225,7 @@ namespace PiCar
 
         private void ConnectToBroker()
         {
-            Settings settings = Settings.LoadSettings();
+            Server settings = Server.LoadSettings();
             IWifi wifi = new Wifi();
 
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
@@ -337,9 +337,9 @@ namespace PiCar
 
         private void ShowSettingsPage()
         {
-            if (Settings.IsOpen) return;
-            Settings.IsOpen = true;
-            Navigation.PushAsync(new SettingsPage(), true);
+            if (Server.IsOpen) return;
+            Server.IsOpen = true;
+            Navigation.PushAsync(new ServerPage(), true);
         }
 
         private void MoveCar() => SendToMosquitto(movement.ToString());
