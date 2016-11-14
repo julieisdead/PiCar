@@ -55,6 +55,9 @@ namespace PiCar
             if (servers.ContainsKey(ServerKey))
                 servers.Remove(ServerKey);
 
+            if (servers.ContainsKey(Name))
+                servers.Remove(Name);
+
             ServerKey = Name;
             servers.Add(ServerKey, this);
 

@@ -34,5 +34,12 @@ namespace PiCar
 	    {
 	        settings.AddServer();
 	    }
+
+        protected override bool OnBackButtonPressed()
+        {
+            Settings.IsOpen = false;
+            Navigation.PopAsync(true);
+            return true;
+        }
 	}
 }
