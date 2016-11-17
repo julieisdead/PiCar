@@ -5,7 +5,7 @@ namespace PiCar
 {
 	public partial class SettingsPage : ContentPage
 	{
-	    private Settings settings;
+	    private readonly Settings settings;
 
         public SettingsPage(string name)
 		{

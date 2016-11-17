@@ -17,8 +17,11 @@
 
       <Style x:Key="ToolbarItem" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="FontAttributes" Value="Bold"/>
-        <Setter Property="Margin" Value="0"/>
+        <Setter Property="FontSize" Value="30"/>
+        <Setter Property="TextColor" Value="#ECEFF1" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="WidthRequest" Value="50" />
+        <Setter Property="HeightRequest" Value="50"/>
       </Style>
 
     </ResourceDictionary>
@@ -33,16 +36,15 @@
         <Picker x:Name="Servers"
                 SelectedIndexChanged="ServersChanged"/>
 
-        <Button x:Name="RefreshButton" 
-                Text="Refresh"
-                Style="{StaticResource ToolbarItem}"
-                Clicked="RefreshClicked"/>
-        
-        <Button x:Name="EditButton"
-                Text="Edit"
-                Style="{StaticResource ToolbarItem}"
-                Clicked="EditClicked"/>
+        <local:FontAwesomeButton  x:Name="RefreshButton"
+                                  FontAwesomeIcon="Refresh"
+                                  Style="{StaticResource ToolbarItem}"
+                                  Clicked="RefreshClicked"/>
 
+        <local:FontAwesomeButton  x:Name="EditButton"
+                                  FontAwesomeIcon="More"
+                                  Style="{StaticResource ToolbarItem}"
+                                  Clicked="EditClicked"/>
       </RelativeLayout>
       
       <xlabs:HybridWebView x:Name="CamWebView"

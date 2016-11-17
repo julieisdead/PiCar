@@ -149,13 +149,11 @@ namespace PiCar
 
                     FakeToolbar.Children.Add(EditButton, 
                         Constraint.RelativeToParent((parent) => parent.Width - 60),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - EditButton.Height * 0.5),
-                        Constraint.Constant(55));
+                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - EditButton.Height * 0.5));
 
                     FakeToolbar.Children.Add(RefreshButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 145),
-                        Constraint.RelativeToParent((parent)=> parent.Height * 0.5 - RefreshButton.Height * 0.5),
-                        Constraint.Constant(85));
+                        Constraint.RelativeToParent((parent) => parent.Width - 105),
+                        Constraint.RelativeToParent((parent)=> parent.Height * 0.5 - RefreshButton.Height * 0.5));
 
                     // Car Cam View
                     MainLayout.Children.Add(CamWebView,

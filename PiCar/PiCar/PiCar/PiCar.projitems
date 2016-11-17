@@ -10,12 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)App.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AppPage.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\CarButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomeButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Movement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Movement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\IPersistentMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MessageFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttAcknowledgeMessage.cs" />
@@ -68,18 +67,23 @@
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttPayload.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\PublishArrivedArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MqttLib\QoS.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SettingsPage.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\AppPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)PageModels\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\SettingsPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)AppPage.xaml">
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Pages\AppPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Pages\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <None Include="$(MSBuildThisFileDirectory)MqttLib\MqttLib_Key.snk" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)SettingsPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)PageModels\" />
   </ItemGroup>
 </Project>

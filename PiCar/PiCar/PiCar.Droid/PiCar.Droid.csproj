@@ -149,18 +149,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseUrl.cs" />
-    <Compile Include="Helpers\Settings.cs" />
+    <Compile Include="Helpers\BaseUrl.cs" />
+    <Compile Include="Helpers\FontAwesomeButtonRenderer.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="CarButtonRenderer.cs" />
+    <Compile Include="Helpers\CarButtonRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />
-    <None Include="Resources\Resource.designer.cs.bak" />
-    <Compile Include="Notifier.cs" />
-    <Compile Include="Wifi.cs" />
+    <Compile Include="Helpers\Notifier.cs" />
+    <Compile Include="Helpers\Wifi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <AndroidAsset Include="Assets\FontAwesome.ttf" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
