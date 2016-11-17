@@ -34,9 +34,16 @@ namespace PiCar
                 Servers.Items.Add(item);
 
             if (!Servers.Items.Contains(SelectedServer))
-                SelectedServer = AppSettings.GetValueOrDefault(SettingsKey, "");
+                SelectedServer = AppSettings.GetValueOrDefault(SettingsKey, string.Empty);
 
-            Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
+            if (!string.IsNullOrEmpty(SelectedServer))
+                Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
+            else if (Servers.Items.Count > 0)
+                Servers.SelectedIndex = 0;
+
+            if (Servers.SelectedIndex >= 0)
+                AppSettings.AddOrUpdateValue(SettingsKey, Servers.Items[Servers.SelectedIndex]);
+
             Connect();
         }
 
@@ -55,7 +62,7 @@ namespace PiCar
         {
             if (Servers.SelectedIndex >= 0)
             {
-                AppSettings.AddOrUpdateValue(SettingsKey, SelectedServer);
+                AppSettings.AddOrUpdateValue(SettingsKey, Servers.Items[Servers.SelectedIndex]);
                 Connect();
             }
         }

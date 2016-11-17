@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -31,11 +32,15 @@ namespace PiCar
             CloseThis();
         }
 
-	    private void DeleteClick(object sender, EventArgs e)
+	    private async void DeleteClick(object sender, EventArgs e)
 	    {
-            settings.DeleteServer();
-            CloseThis();
-        }
+	        bool removeYes = await OnAlertYesNoClicked();
+	        if (removeYes)
+	        {
+	            settings.DeleteServer();
+	            CloseThis();
+	        }
+	    }
 
 	    private void AddClick(object sender, EventArgs e)
 	    {
@@ -59,5 +64,11 @@ namespace PiCar
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
-	}
+
+        private async Task<bool> OnAlertYesNoClicked()
+        {
+            bool answer = await DisplayAlert("Remove Server?", "Do you want to permanently remove this server?", "Yes", "No");
+            return answer;
+        }
+    }
 }
