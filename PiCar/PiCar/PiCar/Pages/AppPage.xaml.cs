@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MqttLib;
 using PiCar.Droid;
+using Plugin.Settings;
+using Plugin.Settings.Abstractions;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -11,12 +13,15 @@ namespace PiCar
     {
         private Movement movement;
         private static IMqtt client;
+        private static ISettings AppSettings => CrossSettings.Current;
+        private const string SettingsKey = "A68d709c745c446cace320c5ec07556f";
+        public static string SelectedServer;
 
         public AppPage()
         {
             InitializeComponent();
             Title = "PiCar";
-
+            SelectedServer = string.Empty;
             movement = new Movement();
         }
 
@@ -27,8 +32,11 @@ namespace PiCar
             Servers.Items.Clear();
             foreach (string item in servers)
                 Servers.Items.Add(item);
-            if (Servers.Items.Count > 0)
-                Servers.SelectedIndex = 0;
+
+            if (!Servers.Items.Contains(SelectedServer))
+                SelectedServer = AppSettings.GetValueOrDefault(SettingsKey, "");
+
+            Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
             Connect();
         }
 
@@ -45,8 +53,11 @@ namespace PiCar
 
         private void ServersChanged(object sender, EventArgs e)
         {
-            if(Servers.SelectedIndex >= 0)
+            if (Servers.SelectedIndex >= 0)
+            {
+                AppSettings.AddOrUpdateValue(SettingsKey, SelectedServer);
                 Connect();
+            }
         }
 
         private void OnForwardTouched(object sender, EventArgs e)

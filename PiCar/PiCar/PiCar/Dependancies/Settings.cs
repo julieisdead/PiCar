@@ -11,8 +11,9 @@ namespace PiCar
 {
     public class Settings : INotifyPropertyChanged
     {
-        private const string SettingsKey = "4db3669d-2162-4eb1-86a9-20a063997745";
+        private const string SettingsKey = "4db3669d21624eb186a920a063997745";
         private static Dictionary<string, Settings> servers;
+        private static ISettings AppSettings => CrossSettings.Current;
 
         public Settings()
         {
@@ -25,6 +26,24 @@ namespace PiCar
             Password = string.Empty;
             MqttPort = 1883;
             CameraPort = 8081;
+        }
+
+        public void LoadServer(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return;
+            servers = new Dictionary<string, Settings>();
+            string settings = AppSettings.GetValueOrDefault(SettingsKey, string.Empty);
+            if (settings == string.Empty) return;
+            servers = JsonConvert.DeserializeObject<Dictionary<string, Settings>>(settings);
+            ServerKey = servers[name].ServerKey;
+            Name = servers[name].Name;
+            RemoteServerName = servers[name].RemoteServerName;
+            LocalSSID = servers[name].LocalSSID;
+            LocalServerName = servers[name].LocalServerName;
+            Username = servers[name].Username;
+            Password = servers[name].Password;
+            MqttPort = servers[name].MqttPort;
+            CameraPort = servers[name].CameraPort;
         }
 
         public static Settings LoadSettings(string serverKey)
@@ -61,6 +80,7 @@ namespace PiCar
             ServerKey = Name;
             servers.Add(ServerKey, this);
 
+            AppPage.SelectedServer = ServerKey;
             string settings = JsonConvert.SerializeObject(servers);
             AppSettings.AddOrUpdateValue(SettingsKey, settings);
         }
@@ -72,6 +92,7 @@ namespace PiCar
                 servers.Remove(ServerKey);
             }
             string settings = JsonConvert.SerializeObject(servers);
+            AppPage.SelectedServer = string.Empty;
             AppSettings.AddOrUpdateValue(SettingsKey, settings);
         }
 
@@ -86,6 +107,7 @@ namespace PiCar
             Password = string.Empty;
             MqttPort = 1883;
             CameraPort = 8081;
+            AppPage.SelectedServer = string.Empty;
         }
 
         public static bool IsOpen { get; set; }
@@ -197,8 +219,6 @@ namespace PiCar
         private string _password;
         private int _mqttPort;
         private int _cameraPort;
-
-        private static ISettings AppSettings => CrossSettings.Current;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

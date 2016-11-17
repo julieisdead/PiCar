@@ -30,6 +30,11 @@
                       VerticalOptions="Start"
                       HeightRequest="50">
 
+        <Picker x:Name="Servers"
+                RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=X, Factor=1, Constant=10}"
+                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=.5, Constant=0}"
+                SelectedIndexChanged="ServersChanged"/>
+
         <local:FontAwesomeButton  x:Name="SaveButton"
                                   FontAwesomeIcon="Check"
                                   Style="{StaticResource ToolbarItem}"
