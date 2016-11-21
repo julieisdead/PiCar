@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
-using MqttLib;
+using Android.Util;
+using uPLibrary.Networking.M2Mqtt;
 using PiCar.Droid;
 using Plugin.Settings;
 using Plugin.Settings.Abstractions;
+using uPLibrary.Networking.M2Mqtt.Messages;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -12,7 +16,7 @@ namespace PiCar
     public partial class AppPage : ContentPage
     {
         private Movement movement;
-        private static IMqtt client;
+        private static MqttClient client;
         private static ISettings AppSettings => CrossSettings.Current;
         private const string SettingsKey = "A68d709c745c446cace320c5ec07556f";
         public static string SelectedServer;
@@ -265,27 +269,31 @@ namespace PiCar
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
-
-            string connectionString = $"tcp://{server}:{settings.MqttPort}";
+;
             try
             {
-                if (string.IsNullOrEmpty(settings.Username))
+                client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
+
+                string username = string.Empty;
+                string password = string.Empty;
+                if (!string.IsNullOrEmpty(settings.Username))
                 {
-                    client = MqttClientFactory.CreateClient(connectionString,
-                        Guid.NewGuid().ToString());
+                    username = settings.Username;
+                    password = settings.Password;
                 }
-                else
+
+                client.ConnectionClosed += client_ConnectionLost;
+                client.MqttMsgPublishReceived += client_PublishArrived;
+
+                Task.Run(() =>
                 {
-                    client = MqttClientFactory.CreateClient(connectionString,
-                        Guid.NewGuid().ToString(), settings.Username, settings.Password);
-                }
-                client.Connected += client_Connected;
-                client.ConnectionLost += client_ConnectionLost;
-                client.PublishArrived += client_PublishArrived;
-                Task.Run(
-                    () =>
-                        client.Connect("car/DISCONNECT", QoS.AtLeastOnce,
-                            XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, false, true));
+                    client.Connect(Guid.NewGuid().ToString(), username, password, true, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
+                        true, "car/DISCONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, true, 30);
+                    RegisterOurSubscriptions();
+                    client.Publish("car/CONNECT", Encoding.Default.GetBytes(XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+                    movement = new Movement();
+                    SendToMosquitto(movement.ToString());
+                });
             }
             catch
             {
@@ -297,36 +305,14 @@ namespace PiCar
         {
             try
             {
-                MqttPayload payload = new MqttPayload(value);
-                client.Publish("car/REQUEST", payload, QoS.AtLeastOnce, false);
+                byte[] payload = Encoding.Default.GetBytes(value);
+                client.Publish("car/REQUEST", payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
             }
             catch
             {
                 //
             }
         }
-
-        public static void SendRestartCommand()
-        {
-            try
-            {
-                MqttPayload paylod = new MqttPayload("1");
-                client.Publish("cam/RESTART", paylod, QoS.AtLeastOnce, false);
-            }
-            catch
-            {
-                //
-            }
-        }
-
-        private void client_Connected(object sender, EventArgs e) => Device.BeginInvokeOnMainThread(() =>
-        {
-            RegisterOurSubscriptions();
-
-            movement = new Movement();
-            SendToMosquitto(movement.ToString());
-            client.Publish("car/CONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, QoS.BestEfforts, false);
-        });
 
         private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client disconnected");
 
@@ -334,9 +320,9 @@ namespace PiCar
         {
             try
             {
-                client.Subscribe("car/RESPOND", QoS.BestEfforts);
-                client.Subscribe("car/RECONCAM", QoS.BestEfforts);
-                client.Subscribe("car/STATE", QoS.BestEfforts);
+                client.Subscribe(new[] {"car/RESPOND"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
+                client.Subscribe(new[] {"car/RECONCAM"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
+                client.Subscribe(new[] {"car/STATE"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
             }
             catch
             {
@@ -344,26 +330,22 @@ namespace PiCar
             }
         }
 
-        private bool client_PublishArrived(object sender, PublishArrivedArgs e)
+        private void client_PublishArrived(object sender, MqttMsgPublishEventArgs e) => Device.BeginInvokeOnMainThread(() =>
         {
-            Device.BeginInvokeOnMainThread(() =>
+            string response = Encoding.Default.GetString(e.Message);
+            switch (e.Topic)
             {
-                string response = e.Payload.ToString();
-                switch (e.Topic)
-                {
-                    case "car/RECONCAM":
-                        ConnectToCam();
-                        return;
-                    case "car/STATE":
-                        StatusText.Text = response;
-                        return;
-                    case "car/RESPOND":
-                        Toaster(response);
-                        break;
-                }
-            });
-            return true;
-        }
+                case "car/RECONCAM":
+                    ConnectToCam();
+                    return;
+                case "car/STATE":
+                    StatusText.Text = response;
+                    return;
+                case "car/RESPOND":
+                    Toaster(response);
+                    break;
+            }
+        });
 
         private void ShowSettingsPage()
         {

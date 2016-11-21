@@ -12,62 +12,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\CarButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomeButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomIconCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomIcon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Movement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Settings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\IPersistentMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MessageFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttAcknowledgeMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttConnackMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttConnectMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttDisconnectMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttMessageReceivedEventArgs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPingReqMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPingRespMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPubackMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPubcompMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPublishMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPubrecMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttPubrelMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttSubackMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttSubscribeMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttUnsubackMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Messages\MqttUnsubscribeMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\MQTTStreamExceptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\NotConnectedException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\QoSManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\StreamFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\StreamManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Subscription.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\IBaseUrl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\IWifi.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Logger\FileLog.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Logger\ILog.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Logger\Log.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MatchTree\Topic.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MatchTree\TopicNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MatchTree\TopicTree.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\CompleteArgs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqtt.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqttConnectDisconnect.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqttPublisher.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqttShared.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqttSharedSubscriber.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IMqttSubscriber.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\IPersistence.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\Mqtt.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttBroker.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttBrokerUnavailableException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttClientFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttDelegates.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttNotConnectedException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttParcel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\MqttPayload.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\PublishArrivedArgs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MqttLib\QoS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pages\AppPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -82,6 +32,5 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Pages\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <None Include="$(MSBuildThisFileDirectory)MqttLib\MqttLib_Key.snk" />
   </ItemGroup>
 </Project>
