@@ -22,6 +22,7 @@ namespace PiCar
             InitializeComponent();
             Title = "PiCar";
             SelectedServer = string.Empty;
+            BackgroundColor = Color.FromHex("#CFD8DC");
             movement = new Movement();
         }
 
@@ -33,16 +34,19 @@ namespace PiCar
             foreach (string item in servers)
                 Servers.Items.Add(item);
 
-            if (!Servers.Items.Contains(SelectedServer))
-                SelectedServer = AppSettings.GetValueOrDefault(SettingsKey, string.Empty);
+            if (Servers.Items.Count == 0)
+            {
+                ShowSettingsPage();
+                return;
+            }
 
-            if (!string.IsNullOrEmpty(SelectedServer))
+            if (SelectedServer != null)
                 Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
-            else if (Servers.Items.Count > 0)
+
+            if (Servers.SelectedIndex < 0)
                 Servers.SelectedIndex = 0;
 
-            if (Servers.SelectedIndex >= 0)
-                AppSettings.AddOrUpdateValue(SettingsKey, Servers.Items[Servers.SelectedIndex]);
+            AppSettings.AddOrUpdateValue(SettingsKey, Servers.Items[Servers.SelectedIndex]);
 
             Connect();
         }
@@ -236,12 +240,6 @@ namespace PiCar
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
 
-            if (string.IsNullOrWhiteSpace(server))
-            {
-                ShowSettingsPage();
-                return;
-            }
-
             string html = "<html><head><style>" +
                           $"body{{Width:{CamWebView.Width - 16}px;Height:{CamWebView.Height - 16}px;}}" +
                           $".loader{{left:{CamWebView.Width/2 - 8};margin:{CamWebView.Height/2 - 46}px auto;position:fixed;}}" +
@@ -268,11 +266,6 @@ namespace PiCar
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
 
-                     if (string.IsNullOrWhiteSpace(server))
-                     {
-                         ShowSettingsPage();
-                         return;
-                     }
             string connectionString = $"tcp://{server}:{settings.MqttPort}";
             try
             {

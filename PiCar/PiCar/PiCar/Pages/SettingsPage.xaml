@@ -33,24 +33,25 @@
         <Picker x:Name="Servers"
                 RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=X, Factor=1, Constant=10}"
                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=.5, Constant=0}"
-                SelectedIndexChanged="ServersChanged"/>
+                SelectedIndexChanged="ServersChanged"
+                TextColor="#ECEFF1"/>
 
-        <local:FontAwesomeButton  x:Name="SaveButton"
-                                  FontAwesomeIcon="Check"
-                                  Style="{StaticResource ToolbarItem}"
-                                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1, Constant=-60}"
-                                  Clicked="SaveClick"/>
+        <local:FontAwesomeButton x:Name="SaveButton"
+                         FontAwesomeIcon="Check"
+                         Style="{StaticResource ToolbarItem}"
+                         RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1, Constant=-60}"
+                         Clicked="SaveClick"/>
 
-        <local:FontAwesomeButton  x:Name="AddButton"
-                                  FontAwesomeIcon="Plus"
-                                  Style="{StaticResource ToolbarItem}"
-                                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=SaveButton, Property=X, Factor=1, Constant=-45}"
-                                  Clicked="AddClick"/>
+        <local:FontAwesomeButton x:Name="AddButton"
+                                 FontAwesomeIcon="Plus"
+                                 Style="{StaticResource ToolbarItem}"
+                                 RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=SaveButton, Property=X, Factor=1, Constant=-45}"
+                                 Clicked="AddClick"/>
         
-        <local:FontAwesomeButton  FontAwesomeIcon="Remove"
-                                  Style="{StaticResource ToolbarItem}"
-                                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=AddButton, Property=X, Factor=1, Constant=-45}"
-                                  Clicked="DeleteClick"/>
+        <local:FontAwesomeButton FontAwesomeIcon="Remove"
+                                 Style="{StaticResource ToolbarItem}"
+                                 RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=AddButton, Property=X, Factor=1, Constant=-45}"
+                                 Clicked="DeleteClick"/>
       </RelativeLayout>
 
       <ScrollView>

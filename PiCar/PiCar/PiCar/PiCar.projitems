@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\CarButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomeButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomIconCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Movement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Settings.cs" />
@@ -82,8 +83,5 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <None Include="$(MSBuildThisFileDirectory)MqttLib\MqttLib_Key.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)PageModels\" />
   </ItemGroup>
 </Project>

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace PiCar
 {
 	public partial class SettingsPage : ContentPage
 	{
-	    private Settings settings;
+	    private readonly Settings settings;
 
         public SettingsPage(string name)
 		{
 		    InitializeComponent();
+            BackgroundColor = Color.FromHex("#CFD8DC");
             settings = Settings.LoadSettings(name);
             NavigationPage.SetHasBackButton(this, false);
             NavigationPage.SetHasNavigationBar(this, false);
@@ -34,26 +33,21 @@ namespace PiCar
 
 	    private async void DeleteClick(object sender, EventArgs e)
 	    {
-	        bool removeYes = await OnAlertYesNoClicked();
-	        if (removeYes)
+	        bool removeYes =
+	            await DisplayAlert("Remove Server?", "Do you want to permanently remove this server?", "Yes", "No");
+            if (removeYes)
 	        {
 	            settings.DeleteServer();
-	            CloseThis();
+                CloseThis();
 	        }
 	    }
 
-	    private void AddClick(object sender, EventArgs e)
-	    {
-	        settings.AddServer();
-	    }
+	    private void AddClick(object sender, EventArgs e) => settings.AddServer();
 
 	    private void ServersChanged(object sender, EventArgs e)
-	    {
-	        settings.LoadServer(Servers.Items[Servers.SelectedIndex]);
-            AppPage.SelectedServer = Servers.Items[Servers.SelectedIndex];
-        }
+	        => settings.LoadServer(Servers.Items[Servers.SelectedIndex]);
 
-        protected override bool OnBackButtonPressed()
+	    protected override bool OnBackButtonPressed()
         {
             CloseThis();
             return true;
@@ -61,14 +55,11 @@ namespace PiCar
 
 	    private void CloseThis()
 	    {
+	        AppPage.SelectedServer = Servers.SelectedIndex >= 0
+                ? Servers.Items[Servers.SelectedIndex]
+                : string.Empty;
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
-        }
-
-        private async Task<bool> OnAlertYesNoClicked()
-        {
-            bool answer = await DisplayAlert("Remove Server?", "Do you want to permanently remove this server?", "Yes", "No");
-            return answer;
         }
     }
 }

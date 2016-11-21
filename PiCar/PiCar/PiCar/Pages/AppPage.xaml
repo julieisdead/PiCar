@@ -10,9 +10,9 @@
       <Style x:Key="ButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="#90A4AE"/>
         <Setter Property="BorderRadius" Value="50"/>
-        <Setter Property="TextColor" Value="#ECEFF1" />
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="Opacity" Value="0.25" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="FontSize" Value="40" />
+        <Setter Property="Opacity" Value=".5" />
       </Style>
 
       <Style x:Key="ToolbarItem" TargetType="Button">
@@ -34,12 +34,13 @@
                    BackgroundColor="#607D8B">
 
         <Picker x:Name="Servers"
-                SelectedIndexChanged="ServersChanged"/>
+                SelectedIndexChanged="ServersChanged"
+                TextColor="#ECEFF1"/>
 
-        <local:FontAwesomeButton  x:Name="RefreshButton"
-                                  FontAwesomeIcon="Refresh"
-                                  Style="{StaticResource ToolbarItem}"
-                                  Clicked="RefreshClicked"/>
+        <local:FontAwesomeButton x:Name="RefreshButton"
+                                 FontAwesomeIcon="Refresh"
+                                 Style="{StaticResource ToolbarItem}"
+                                 Clicked="RefreshClicked"/>
 
         <local:FontAwesomeButton  x:Name="EditButton"
                                   FontAwesomeIcon="More"
@@ -55,22 +56,22 @@
              FontSize="18"/>
 
       <local:CarButton x:Name="ForwardButton"
-                       Text="Forward"
+                       FontAwesomeIcon="ArrowUp"
                        Touched="OnForwardTouched"
                        Style="{StaticResource ButtonStyle}"/>
 
       <local:CarButton x:Name="ReverseButton"
-                       Text="Reverse"
+                       FontAwesomeIcon="ArrowDown"
                        Touched="OnReverseTouched"
                        Style="{StaticResource ButtonStyle}"/>
 
       <local:CarButton x:Name="LeftButton"
-                       Text="Left"
+                       FontAwesomeIcon="ArrowLeft"
                        Touched="OnLeftTouched"
                        Style="{StaticResource ButtonStyle}"/>
 
       <local:CarButton x:Name="RightButton"
-                       Text="Right"
+                       FontAwesomeIcon="ArrowRight"
                        Touched="OnRightTouched"
                        Style="{StaticResource ButtonStyle}"/>
 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-  <style name="Theme.Splash" parent="@android:style/Theme.Material">
+  <style name="Theme.Splash" parent="@android:style/Theme.Material.Light">
     <item name="android:actionBarSize">0dp</item>
     <item name="android:windowBackground">@color/myWindowBackground</item>
   </style>
