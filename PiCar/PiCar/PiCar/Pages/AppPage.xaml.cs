@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Android.Util;
 using uPLibrary.Networking.M2Mqtt;
 using PiCar.Droid;
 using Plugin.Settings;
@@ -60,6 +58,8 @@ namespace PiCar
             base.OnDisappearing();
             movement = new Movement();
             SendToMosquitto(movement.ToString());
+            client.Disconnect();
+            CamWebView.LoadContent("");
         }
 
         private void EditClicked(object sender, EventArgs e) => ShowSettingsPage();
@@ -314,7 +314,11 @@ namespace PiCar
             }
         }
 
-        private static void client_ConnectionLost(object sender, EventArgs e) => Toaster("Client disconnected");
+        private void client_ConnectionLost(object sender, EventArgs e)
+        {
+            if (IsFocused)
+                Toaster("Client disconnected");
+        }
 
         private static void RegisterOurSubscriptions()
         {
