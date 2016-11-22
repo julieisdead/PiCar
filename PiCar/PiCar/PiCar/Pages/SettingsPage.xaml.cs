@@ -28,6 +28,7 @@ namespace PiCar
         private void SaveClick(object sender, EventArgs e)
         {
             settings.SaveServer();
+            AppPage.SelectedServer = settings.Name;
             CloseThis();
         }
 
@@ -38,6 +39,7 @@ namespace PiCar
             if (removeYes)
 	        {
 	            settings.DeleteServer();
+	            AppPage.SelectedServer = string.Empty;
                 CloseThis();
 	        }
 	    }
@@ -45,7 +47,10 @@ namespace PiCar
 	    private void AddClick(object sender, EventArgs e) => settings.AddServer();
 
 	    private void ServersChanged(object sender, EventArgs e)
-	        => settings.LoadServer(Servers.Items[Servers.SelectedIndex]);
+	    {
+	        AppPage.SelectedServer = Servers.Items[Servers.SelectedIndex];
+	        settings.LoadServer(Servers.Items[Servers.SelectedIndex]);
+	    }
 
 	    protected override bool OnBackButtonPressed()
         {
@@ -55,9 +60,6 @@ namespace PiCar
 
 	    private void CloseThis()
 	    {
-	        AppPage.SelectedServer = Servers.SelectedIndex >= 0
-                ? Servers.Items[Servers.SelectedIndex]
-                : string.Empty;
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using uPLibrary.Networking.M2Mqtt;
 using PiCar.Droid;
 using Plugin.Settings;
@@ -42,8 +41,10 @@ namespace PiCar
                 return;
             }
 
-            if (SelectedServer != null)
-                Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
+            if (string.IsNullOrEmpty(SelectedServer))
+                SelectedServer = AppSettings.GetValueOrDefault(SettingsKey, string.Empty);
+
+            Servers.SelectedIndex = Servers.Items.IndexOf(SelectedServer);
 
             if (Servers.SelectedIndex < 0)
                 Servers.SelectedIndex = 0;
@@ -58,7 +59,8 @@ namespace PiCar
             base.OnDisappearing();
             movement = new Movement();
             SendToMosquitto(movement.ToString());
-            client.Disconnect();
+            if (client != null && client.IsConnected)
+                client.Disconnect();
             CamWebView.LoadContent("");
         }
 
@@ -269,42 +271,50 @@ namespace PiCar
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
-;
+
+            client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
+
+            string username = string.Empty;
+            string password = string.Empty;
+            if (!string.IsNullOrEmpty(settings.Username))
+            {
+                username = settings.Username;
+                password = settings.Password;
+            }
+
+            client.ConnectionClosed += client_ConnectionLost;
+            client.MqttMsgPublishReceived += client_PublishArrived;
+
             try
             {
-                client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
-
-                string username = string.Empty;
-                string password = string.Empty;
-                if (!string.IsNullOrEmpty(settings.Username))
-                {
-                    username = settings.Username;
-                    password = settings.Password;
-                }
-
-                client.ConnectionClosed += client_ConnectionLost;
-                client.MqttMsgPublishReceived += client_PublishArrived;
-
-                Task.Run(() =>
-                {
-                    client.Connect(Guid.NewGuid().ToString(), username, password, true, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
-                        true, "car/DISCONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, true, 30);
-                    RegisterOurSubscriptions();
-                    client.Publish("car/CONNECT", Encoding.Default.GetBytes(XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
-                    movement = new Movement();
-                    SendToMosquitto(movement.ToString());
-                });
+                client.Connect(Guid.NewGuid().ToString(), username, password, true,
+                    MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
+                    true, "car/DISCONNECT", XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name, true, 30);
             }
             catch
             {
-                //
+                Toaster("Failed to connect to broker.");
+                return;
             }
+            if (!client.IsConnected)
+            {
+                Toaster("Failed to connect to broker.");
+                return;
+            }
+
+            RegisterOurSubscriptions();
+            client.Publish("car/CONNECT",
+                Encoding.Default.GetBytes(XLabs.Platform.Device.AndroidDevice.CurrentDevice.Name),
+                MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+            movement = new Movement();
+            SendToMosquitto(movement.ToString());
         }
 
         private static void SendToMosquitto(string value)
         {
             try
             {
+                if(!client.IsConnected) return;
                 byte[] payload = Encoding.Default.GetBytes(value);
                 client.Publish("car/REQUEST", payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
             }
@@ -316,8 +326,7 @@ namespace PiCar
 
         private void client_ConnectionLost(object sender, EventArgs e)
         {
-            if (IsFocused)
-                Toaster("Client disconnected");
+            Toaster("Client disconnected");
         }
 
         private static void RegisterOurSubscriptions()
@@ -325,7 +334,6 @@ namespace PiCar
             try
             {
                 client.Subscribe(new[] {"car/RESPOND"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
-                client.Subscribe(new[] {"car/RECONCAM"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
                 client.Subscribe(new[] {"car/STATE"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
             }
             catch
@@ -339,9 +347,6 @@ namespace PiCar
             string response = Encoding.Default.GetString(e.Message);
             switch (e.Topic)
             {
-                case "car/RECONCAM":
-                    ConnectToCam();
-                    return;
                 case "car/STATE":
                     StatusText.Text = response;
                     return;
