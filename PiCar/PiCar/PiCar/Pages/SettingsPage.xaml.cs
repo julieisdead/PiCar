@@ -60,6 +60,7 @@ namespace PiCar
 
 	    private void CloseThis()
 	    {
+            if(Settings.IsOpen == false) return;
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
