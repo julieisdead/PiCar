@@ -235,7 +235,7 @@ namespace PiCar
         private void Connect()
         {
             Task.Run(() => ConnectToBroker());
-            ConnectToCam();
+            Task.Run(() => ConnectToCam());
         }
 
         private void ConnectToCam()
@@ -262,7 +262,7 @@ namespace PiCar
                           $"<img class=\"camview\" src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
                           "</body></html>";
 
-            CamWebView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get());
+            Device.BeginInvokeOnMainThread(() => CamWebView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get()));
         }
 
         private void ConnectToBroker()
