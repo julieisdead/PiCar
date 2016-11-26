@@ -286,21 +286,20 @@ namespace PiCar
                         
             Device.BeginInvokeOnMainThread(() =>
             {
-                StatusText.Text = "";
-                client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
-
-                string username = string.Empty;
-                string password = string.Empty;
-                if (!string.IsNullOrEmpty(settings.Username))
-                {
-                    username = settings.Username;
-                    password = settings.Password;
-                }
-
-                client.ConnectionClosed += client_ConnectionLost;
-                client.MqttMsgPublishReceived += client_PublishArrived;
                 try
                 {
+                    client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
+
+                    string username = string.Empty;
+                    string password = string.Empty;
+                    if (!string.IsNullOrEmpty(settings.Username))
+                    {
+                        username = settings.Username;
+                        password = settings.Password;
+                    }
+
+                    client.ConnectionClosed += client_ConnectionLost;
+                    client.MqttMsgPublishReceived += client_PublishArrived;
                     byte connAck = client.Connect(Guid.NewGuid().ToString(), username, password, true,
                         MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
                         true, "car/DISCONNECT", name, true, 30);
@@ -365,7 +364,10 @@ namespace PiCar
 
         private void client_ConnectionLost(object sender, EventArgs e)
         {
-            //Toaster("Client disconnected");
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                StatusText.Text = string.Empty;
+            });
         }
 
         private static void RegisterOurSubscriptions()
