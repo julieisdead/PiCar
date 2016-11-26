@@ -234,8 +234,8 @@ namespace PiCar
 
         private void Connect()
         {
-            Task.Run(() => ConnectToBroker());
-            Task.Run(() => ConnectToCam());
+            ConnectToBroker();
+            ConnectToCam();
         }
 
         private void ConnectToCam()
@@ -267,26 +267,26 @@ namespace PiCar
 
         private void ConnectToBroker()
         {
-            try
+            if (Servers.SelectedIndex < 0)
             {
+                ShowSettingsPage();
+                return;
+            }
+            if (client != null && client.IsConnected) return;
 
-                if (Servers.SelectedIndex < 0)
-                {
-                    ShowSettingsPage();
-                    return;
-                }
-                Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
-                IWifi wifi = new Wifi();
+            Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
+            IWifi wifi = new Wifi();
 
-                IDeviceInfo device = new DeviceInfo();
-                string name = device.GetName();
+            IDeviceInfo device = new DeviceInfo();
+            string name = device.GetName();
 
-                string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
-                    ? settings.LocalServerName
-                    : settings.RemoteServerName;
-
-                if(client != null && client.IsConnected) return;
-
+            string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
+                ? settings.LocalServerName
+                : settings.RemoteServerName;
+                        
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                StatusText.Text = "";
                 client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
 
                 string username = string.Empty;
@@ -299,28 +299,54 @@ namespace PiCar
 
                 client.ConnectionClosed += client_ConnectionLost;
                 client.MqttMsgPublishReceived += client_PublishArrived;
-                client.Connect(Guid.NewGuid().ToString(), username, password, true,
-                    MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
-                    true, "car/DISCONNECT", name, true, 30);
+                try
+                {
+                    byte connAck = client.Connect(Guid.NewGuid().ToString(), username, password, true,
+                        MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
+                        true, "car/DISCONNECT", name, true, 30);
 
-                if (!client.IsConnected)
+                    switch (connAck)
+                    {
+                        case MqttMsgConnack.CONN_ACCEPTED:
+                            RegisterOurSubscriptions();
+                            client.Publish("car/CONNET",
+                                Encoding.Default.GetBytes(name),
+                                MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+                            movement = new Movement();
+                            SendToMosquitto(movement.ToString());
+                            break;
+
+                        case MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED:
+                            Toaster("Connection Refused.\nIdentity rejected.");
+                            break;
+
+                        case MqttMsgConnack.CONN_REFUSED_NOT_AUTHORIZED:
+                            Toaster("Connection Refused.\nNot authorized.");
+                            break;
+
+                        case MqttMsgConnack.CONN_REFUSED_PROT_VERS:
+                            Toaster("Connection Refused.\nInvalid Protocol.");
+                            break;
+
+                        case MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE:
+                            Toaster("Connection Refused.\nServer unavailable.");
+                            break;
+
+                        case MqttMsgConnack.CONN_REFUSED_USERNAME_PASSWORD:
+                            Toaster("Connection Refused.\nInvalid username or password.");
+                            break;
+
+                        default:
+                            Toaster("Failed to connect to broker.");
+                            break;
+                    }
+                }
+                catch
                 {
                     Toaster("Failed to connect to broker.");
                     return;
                 }
-
-                RegisterOurSubscriptions();
-                client.Publish("car/CONNECT",
-                    Encoding.Default.GetBytes(name),
-                    MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
-                movement = new Movement();
-                SendToMosquitto(movement.ToString());
-            }
-            catch
-            {
-                if(client != null && client.IsConnected) return;
-                Toaster("Failed to connect to broker.");
-            }
+            });
         }
 
         private static void SendToMosquitto(string value)
