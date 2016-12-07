@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using uPLibrary.Networking.M2Mqtt;
+using MqttLib;
 using PiCar.Droid;
 using Plugin.Settings;
 using Plugin.Settings.Abstractions;
-using uPLibrary.Networking.M2Mqtt.Messages;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -14,10 +11,11 @@ namespace PiCar
     public partial class AppPage : ContentPage
     {
         private Movement movement;
-        private static MqttClient client;
+        private static IMqtt client;
         private static ISettings AppSettings => CrossSettings.Current;
         private const string SettingsKey = "A68d709c745c446cace320c5ec07556f";
         public static string SelectedServer;
+        private static bool _clientConnected;
 
         public AppPage()
         {
@@ -60,17 +58,14 @@ namespace PiCar
             base.OnDisappearing();
             movement = new Movement();
             SendToMosquitto(movement.ToString());
-            if (client != null && client.IsConnected)
-                client.Disconnect();
-            CamWebView.LoadContent("");
+            Disconnect();
         }
 
         private void EditClicked(object sender, EventArgs e) => ShowSettingsPage();
 
         private void RefreshClicked(object sender, EventArgs e)
         {
-            if(client != null && client.IsConnected)
-                client.Disconnect();
+            Disconnect();
             Connect();
         }
 
@@ -182,7 +177,7 @@ namespace PiCar
                         Constraint.RelativeToParent((parent) => parent.Height * 0.5 - Servers.Height * 0.5),
                         Constraint.RelativeToParent((parent) => parent.Width * 0.5));
 
-                    FakeToolbar.Children.Add(EditButton, 
+                    FakeToolbar.Children.Add(EditButton,
                         Constraint.RelativeToParent((parent) => parent.Width - 60),
                         Constraint.RelativeToParent((parent) => parent.Height * 0.5 - EditButton.Height * 0.5));
 
@@ -238,6 +233,24 @@ namespace PiCar
             ConnectToCam();
         }
 
+        private void Disconnect()
+        {
+            try
+            {
+                if (client != null && client.IsConnected)
+                    client.Disconnect();
+                CamWebView.LoadContent("");
+            }
+            catch (Exception ex)
+            {
+                Toaster(ex.Message);
+            }
+            finally
+            {
+                _clientConnected = false;
+            }
+        }
+
         private void ConnectToCam()
         {
             if (Servers.SelectedIndex < 0)
@@ -272,78 +285,40 @@ namespace PiCar
                 ShowSettingsPage();
                 return;
             }
-            if (client != null && client.IsConnected) return;
+            if (_clientConnected) return;
 
             Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
             IWifi wifi = new Wifi();
 
-            IDeviceInfo device = new DeviceInfo();
-            string name = device.GetName();
-
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""
                 ? settings.LocalServerName
                 : settings.RemoteServerName;
-                        
+
+            string connectionString = $"tcp://{server}:{settings.MqttPort}";
+
             Device.BeginInvokeOnMainThread(() =>
             {
+                if (!string.IsNullOrEmpty(settings.Username))
+                    client = MqttClientFactory.CreateClient(connectionString, Guid.NewGuid().ToString(), settings.Username,
+                        settings.Password);
+                else
+                    client = MqttClientFactory.CreateClient(connectionString, Guid.NewGuid().ToString());
+
+                client.Connected += ClientConnected;
+                client.ConnectionLost += ClientConnectionLost;
+                client.PublishArrived += ClientPublishArrived;
+
+                IDeviceInfo device = new DeviceInfo();
+                string name = device.GetName();
+
                 try
                 {
-                    client = new MqttClient(server, settings.MqttPort, false, null, null, MqttSslProtocols.None);
-
-                    string username = string.Empty;
-                    string password = string.Empty;
-                    if (!string.IsNullOrEmpty(settings.Username))
-                    {
-                        username = settings.Username;
-                        password = settings.Password;
-                    }
-
-                    client.ConnectionClosed += client_ConnectionLost;
-                    client.MqttMsgPublishReceived += client_PublishArrived;
-                    byte connAck = client.Connect(Guid.NewGuid().ToString(), username, password, true,
-                        MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE,
-                        true, "car/DISCONNECT", name, true, 30);
-
-                    switch (connAck)
-                    {
-                        case MqttMsgConnack.CONN_ACCEPTED:
-                            RegisterOurSubscriptions();
-                            client.Publish("car/CONNET",
-                                Encoding.Default.GetBytes(name),
-                                MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
-                            movement = new Movement();
-                            SendToMosquitto(movement.ToString());
-                            break;
-
-                        case MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED:
-                            Toaster("Connection Refused.\nIdentity rejected.");
-                            break;
-
-                        case MqttMsgConnack.CONN_REFUSED_NOT_AUTHORIZED:
-                            Toaster("Connection Refused.\nNot authorized.");
-                            break;
-
-                        case MqttMsgConnack.CONN_REFUSED_PROT_VERS:
-                            Toaster("Connection Refused.\nInvalid Protocol.");
-                            break;
-
-                        case MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE:
-                            Toaster("Connection Refused.\nServer unavailable.");
-                            break;
-
-                        case MqttMsgConnack.CONN_REFUSED_USERNAME_PASSWORD:
-                            Toaster("Connection Refused.\nInvalid username or password.");
-                            break;
-
-                        default:
-                            Toaster("Failed to connect to broker.");
-                            break;
-                    }
+                    client.Connect("car/DISCONNECT", QoS.BestEfforts, new MqttPayload(name), false, true);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Toaster("Failed to connect to broker.");
-                    return;
+                    Toaster(ex.Message);
+                    _clientConnected = false;
                 }
             });
         }
@@ -352,9 +327,8 @@ namespace PiCar
         {
             try
             {
-                if(!client.IsConnected) return;
-                byte[] payload = Encoding.Default.GetBytes(value);
-                client.Publish("car/REQUEST", payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+                if(!_clientConnected) return;
+                client.Publish("car/REQUEST", new MqttPayload(value), QoS.AtLeastOnce, false);
             }
             catch
             {
@@ -362,40 +336,48 @@ namespace PiCar
             }
         }
 
-        private void client_ConnectionLost(object sender, EventArgs e)
+        private void ClientConnected(object sender, EventArgs e) => Device.BeginInvokeOnMainThread(delegate
+        {
+            client.Subscribe("car/STATE", QoS.AtLeastOnce);
+            client.Subscribe("car/RESPOND", QoS.AtLeastOnce);
+            client.Subscribe("car/STATUS", QoS.AtLeastOnce);
+            StatusText.Text = string.Empty;
+
+            _clientConnected = true;
+
+            IDeviceInfo device = new DeviceInfo();
+            string name = device.GetName();
+            MqttPayload payload = new MqttPayload(name);
+            client.Publish("car/CONNECT", payload, QoS.AtLeastOnce, false);
+        });
+
+
+        private void ClientConnectionLost(object sender, EventArgs e) => Device.BeginInvokeOnMainThread(() =>
+        {
+            _clientConnected = false;
+            StatusText.Text = string.Empty;
+            Toaster("Client connection lost.");
+        });
+
+        private bool ClientPublishArrived(object sender, PublishArrivedArgs e)
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-                StatusText.Text = string.Empty;
+                switch (e.Topic)
+                {
+                    case "car/STATE":
+                        StatusText.Text = e.Payload.ToString();
+                        return;
+                    case "car/RESPOND":
+                        Toaster(e.Payload.ToString());
+                        break;
+                    case "car/STATUS":
+                        Toaster(e.Payload.ToString());
+                        break;
+                }
             });
+            return true;
         }
-
-        private static void RegisterOurSubscriptions()
-        {
-            try
-            {
-                client.Subscribe(new[] {"car/RESPOND"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
-                client.Subscribe(new[] {"car/STATE"}, new[] {MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE});
-            }
-            catch
-            {
-                //
-            }
-        }
-
-        private void client_PublishArrived(object sender, MqttMsgPublishEventArgs e) => Device.BeginInvokeOnMainThread(() =>
-        {
-            string response = Encoding.Default.GetString(e.Message);
-            switch (e.Topic)
-            {
-                case "car/STATE":
-                    StatusText.Text = response;
-                    return;
-                case "car/RESPOND":
-                    Toaster(response);
-                    break;
-            }
-        });
 
         private void ShowSettingsPage()
         {
