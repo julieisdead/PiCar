@@ -350,6 +350,8 @@ namespace PiCar
             string name = device.GetName();
             MqttPayload payload = new MqttPayload(name);
             client.Publish("car/CONNECT", payload, QoS.BestEfforts, false);
+            movement = new Movement();
+            MoveCar();
         });
 
 
