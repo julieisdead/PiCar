@@ -1,7 +1,16 @@
-﻿namespace PiCar
+﻿using Android.Widget;
+
+namespace PiCar
 {
-    interface INotifier
+    public enum ToastPriority
     {
-        void MakeToast(string message);
+        Low,
+        High,
+        Critical
+    }
+
+    internal interface INotifier
+    {
+        void MakeToast(string message, ToastPriority priority, ToastLength Length);
     }
 }

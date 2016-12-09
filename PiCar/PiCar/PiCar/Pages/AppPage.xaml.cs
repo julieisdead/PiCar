@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Android.Widget;
 using MqttLib;
 using PiCar.Droid;
 using Plugin.Settings;
@@ -243,7 +244,7 @@ namespace PiCar
             }
             catch (Exception ex)
             {
-                Toaster(ex.Message);
+                Toaster(ex.Message, ToastPriority.Critical, ToastLength.Long);
             }
             finally
             {
@@ -317,7 +318,7 @@ namespace PiCar
                 }
                 catch (Exception ex)
                 {
-                    Toaster(ex.Message);
+                    Toaster(ex.Message, ToastPriority.Critical, ToastLength.Long);
                     _clientConnected = false;
                 }
             });
@@ -330,17 +331,17 @@ namespace PiCar
                 if(!_clientConnected) return;
                 client.Publish("car/REQUEST", new MqttPayload(value), QoS.AtLeastOnce, false);
             }
-            catch
+            catch(Exception ex)
             {
-                //
+                Toaster(ex.Message, ToastPriority.Critical, ToastLength.Long);
             }
         }
 
         private void ClientConnected(object sender, EventArgs e) => Device.BeginInvokeOnMainThread(delegate
         {
-            client.Subscribe("car/STATE", QoS.AtLeastOnce);
-            client.Subscribe("car/RESPOND", QoS.AtLeastOnce);
-            client.Subscribe("car/STATUS", QoS.AtLeastOnce);
+            client.Subscribe("car/STATE", QoS.BestEfforts);
+            client.Subscribe("car/RESPOND", QoS.BestEfforts);
+            client.Subscribe("car/STATUS", QoS.BestEfforts);
             StatusText.Text = string.Empty;
 
             _clientConnected = true;
@@ -348,7 +349,7 @@ namespace PiCar
             IDeviceInfo device = new DeviceInfo();
             string name = device.GetName();
             MqttPayload payload = new MqttPayload(name);
-            client.Publish("car/CONNECT", payload, QoS.AtLeastOnce, false);
+            client.Publish("car/CONNECT", payload, QoS.BestEfforts, false);
         });
 
 
@@ -372,7 +373,7 @@ namespace PiCar
                         Toaster(e.Payload.ToString());
                         break;
                     case "car/STATUS":
-                        Toaster(e.Payload.ToString());
+                        Toaster(e.Payload.ToString(), ToastPriority.High);
                         break;
                 }
             });
@@ -394,6 +395,16 @@ namespace PiCar
 
         private static void Toaster(string message)
             => Device.BeginInvokeOnMainThread(()
-                => DependencyService.Get<INotifier>().MakeToast(message));
+                => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, ToastLength.Short));
+        // Not Used
+        //private static void Toaster(string message, ToastLength length)
+        //    => Device.BeginInvokeOnMainThread(()
+        //        => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, length));
+        private static void Toaster(string message, ToastPriority priority)
+            => Device.BeginInvokeOnMainThread(()
+                => DependencyService.Get<INotifier>().MakeToast(message, priority, ToastLength.Short));
+        private static void Toaster(string message, ToastPriority priority, ToastLength length)
+            => Device.BeginInvokeOnMainThread(()
+                => DependencyService.Get<INotifier>().MakeToast(message, priority, length));
     }
 }
