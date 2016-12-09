@@ -238,6 +238,8 @@ namespace PiCar
         {
             try
             {
+                movement = new Movement();
+                MoveCar();
                 if (client != null && client.IsConnected)
                     client.Disconnect();
                 CamWebView.LoadContent("");
