@@ -152,6 +152,7 @@
     <Compile Include="Helpers\BaseUrl.cs" />
     <Compile Include="Helpers\FontAwesomeButtonRenderer.cs" />
     <Compile Include="Helpers\DeviceInfo.cs" />
+    <Compile Include="Helpers\Orientate.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Helpers\CarButtonRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

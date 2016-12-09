@@ -20,6 +20,7 @@ namespace PiCar
             ServerKey = string.Empty;
             Name = string.Empty;
             RemoteServerName = string.Empty;
+            EnableControls = false;
             LocalSSID = string.Empty;
             LocalServerName = string.Empty;
             Username = string.Empty;
@@ -38,6 +39,7 @@ namespace PiCar
             ServerKey = servers[name].ServerKey;
             Name = servers[name].Name;
             RemoteServerName = servers[name].RemoteServerName;
+            EnableControls = servers[name].EnableControls;
             LocalSSID = servers[name].LocalSSID;
             LocalServerName = servers[name].LocalServerName;
             Username = servers[name].Username;
@@ -101,6 +103,7 @@ namespace PiCar
             ServerKey = string.Empty;
             Name = string.Empty;
             RemoteServerName = string.Empty;
+            EnableControls = false;
             LocalSSID = string.Empty;
             LocalServerName = string.Empty;
             Username = string.Empty;
@@ -138,6 +141,7 @@ namespace PiCar
                 }
             }
         }
+
         public string LocalSSID
         {
             get { return _localSsid; }
@@ -162,6 +166,20 @@ namespace PiCar
                 }
             }
         }
+
+        public bool EnableControls
+        {
+            get { return _enableControls; }
+            set
+            {
+                if (_enableControls != value)
+                {
+                    _enableControls = value;
+                    OnPropertyChanged(nameof(EnableControls));
+                }
+            }
+        }
+
         public string Username
         {
             get { return _username; }
@@ -215,6 +233,7 @@ namespace PiCar
         private string _remoteServerName;
         private string _localSsid;
         private string _localServerName;
+        private bool _enableControls;
         private string _username;
         private string _password;
         private int _mqttPort;

@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\FontAwesomIcon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\IDeviceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\INotifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dependancies\IOrientate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Movement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dependancies\IBaseUrl.cs" />

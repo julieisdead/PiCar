@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xlabs="clr-namespace:XLabs.Forms.Controls;assembly=XLabs.Forms"
              xmlns:local="clr-namespace:PiCar;assembly=PiCar"
              x:Class="PiCar.SettingsPage"
              Icon="hamburger.png"
@@ -47,7 +48,7 @@
                                  Style="{StaticResource ToolbarItem}"
                                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=SaveButton, Property=X, Factor=1, Constant=-45}"
                                  Clicked="AddClick"/>
-        
+
         <local:FontAwesomeButton FontAwesomeIcon="Remove"
                                  Style="{StaticResource ToolbarItem}"
                                  RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToView, ElementName=AddButton, Property=X, Factor=1, Constant=-45}"
@@ -56,10 +57,10 @@
 
       <ScrollView>
 
-
         <StackLayout Padding="30"
                      Spacing="10"
-                     VerticalOptions="Fill">
+                     VerticalOptions="Fill"
+                     LayoutChanged="ControlsLayoutLayoutChanged">
 
           <StackLayout Orientation="Horizontal">
             <Label Text="Server Name"
@@ -102,6 +103,20 @@
           </StackLayout>
 
           <StackLayout Orientation="Horizontal">
+            <Label Text="Enable Control"
+                   WidthRequest="100"
+                   VerticalOptions="Center"/>
+
+            <xlabs:CheckBox x:Name="EnableControlsCheckBox"
+                            HorizontalOptions="FillAndExpand"
+                            Checked="{Binding EnableControls, Mode=TwoWay}"
+                            UncheckedText="Only camera is enabled"
+                            CheckedText="Controls are enabled"
+                            CheckedChanged="EnableControlsCheckBoxCheckChanged"/>
+          </StackLayout>
+
+          <StackLayout x:Name="LayoutUserName"
+                       Orientation="Horizontal">
             <Label Text="Username"
                    WidthRequest="100"
                    VerticalOptions="Center"/>
@@ -110,8 +125,8 @@
                    HorizontalOptions="FillAndExpand"/>
           </StackLayout>
 
-
-          <StackLayout Orientation="Horizontal">
+          <StackLayout x:Name="LayoutPassword"
+                       Orientation="Horizontal">
             <Label Text="Password"
                    WidthRequest="100"
                    VerticalOptions="Center"/>
@@ -121,8 +136,8 @@
                    HorizontalOptions="FillAndExpand"/>
           </StackLayout>
 
-
-          <StackLayout Orientation="Horizontal">
+          <StackLayout x:Name="LayoutMqttPort"
+                       Orientation="Horizontal">
             <Label Text="MQTT Port"
                    WidthRequest="100"
                    VerticalOptions="Center"/>
@@ -132,16 +147,17 @@
                    HorizontalOptions="FillAndExpand"/>
           </StackLayout>
 
-          <StackLayout Orientation="Horizontal">
-            <Label Text="Camera Port"
-                   WidthRequest="100"
-                   VerticalOptions="Center"/>
+        <StackLayout x:Name="LayoutCam"
+                     Orientation="Horizontal">
+          <Label Text="Camera Port"
+                 WidthRequest="100"
+                 VerticalOptions="Center"/>
 
-            <Entry Text="{Binding CameraPort, Mode=TwoWay}"
-                   Keyboard="Numeric"
-                   HorizontalOptions="FillAndExpand"/>
-          </StackLayout>
-
+          <Entry Text="{Binding CameraPort, Mode=TwoWay}"
+                 Keyboard="Numeric"
+                 HorizontalOptions="FillAndExpand"/>
+           </StackLayout>
+        
         </StackLayout>
       </ScrollView>
     </StackLayout>

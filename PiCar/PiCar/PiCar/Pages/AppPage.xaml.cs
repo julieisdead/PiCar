@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using Android.Content.PM;
 using Android.Widget;
 using MqttLib;
 using PiCar.Droid;
@@ -21,6 +23,7 @@ namespace PiCar
         public AppPage()
         {
             InitializeComponent();
+
             Title = "PiCar";
             SelectedServer = string.Empty;
             BackgroundColor = Color.FromHex("#CFD8DC");
@@ -30,6 +33,9 @@ namespace PiCar
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            DependencyService.Get<IOrientate>().SetOrientation(ScreenOrientation.User);
+
             List<string> servers = Settings.GetServers();
             Servers.Items.Clear();
             foreach (string item in servers)
@@ -50,7 +56,7 @@ namespace PiCar
                 Servers.SelectedIndex = 0;
 
             AppSettings.AddOrUpdateValue(SettingsKey, Servers.Items[Servers.SelectedIndex]);
-
+            DrawScreen();
             Connect();
         }
 
@@ -110,6 +116,7 @@ namespace PiCar
 
         private double pageWidth;
         private double pageHeight;
+        private Orientation currentOrientation;
 
         protected override void OnSizeAllocated(double newWidth, double newHeight)
         {
@@ -118,114 +125,136 @@ namespace PiCar
             {
                 pageWidth = newWidth;
                 pageHeight = newHeight;
-                if (newWidth > newHeight)
-                {
-                    NavigationPage.SetHasNavigationBar(this, false);
-                    MainLayout.Children.Clear();
-
-                    //Car Cam View
-                    MainLayout.Children.Add(CamWebView,
-                        Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15),
-                        Constraint.RelativeToParent((parent) => parent.Y),
-                        Constraint.RelativeToParent((parent) => parent.Width*0.7),
-                        Constraint.RelativeToParent((parent) => parent.Height));
-
-                    // StatusText
-                    MainLayout.Children.Add(StatusText,
-                        Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15 + 20),
-                        Constraint.RelativeToParent((parent) => parent.Height - StatusText.Height - 5),
-                        Constraint.RelativeToParent((parent) => parent.Width*0.7),
-                        Constraint.Constant(StatusText.Height));
-
-                    MainLayout.Children.Add(ForwardButton,
-                        Constraint.RelativeToParent((parent) => parent.X + 20),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(ReverseButton,
-                        Constraint.RelativeToParent((parent) => parent.X + 60),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(RightButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 95),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(LeftButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 135),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-                }
-                else
-                {
-                    NavigationPage.SetHasNavigationBar(this, false);
-                    MainLayout.Children.Clear();
-
-                    MainLayout.Children.Add(FakeToolbar,
-                        Constraint.Constant(0),
-                        Constraint.Constant(0),
-                        Constraint.RelativeToParent((parent) => parent.Width),
-                        Constraint.Constant(50));
-
-                    FakeToolbar.Children.Clear();
-                    FakeToolbar.Children.Add(Servers,
-                        Constraint.RelativeToParent((parent) => parent.X + 10),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - Servers.Height * 0.5),
-                        Constraint.RelativeToParent((parent) => parent.Width * 0.5));
-
-                    FakeToolbar.Children.Add(EditButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 60),
-                        Constraint.RelativeToParent((parent) => parent.Height * 0.5 - EditButton.Height * 0.5));
-
-                    FakeToolbar.Children.Add(RefreshButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 105),
-                        Constraint.RelativeToParent((parent)=> parent.Height * 0.5 - RefreshButton.Height * 0.5));
-
-                    // Car Cam View
-                    MainLayout.Children.Add(CamWebView,
-                        Constraint.RelativeToParent((parent) => parent.X),
-                        Constraint.RelativeToParent((parent) => parent.Y + 50),
-                        Constraint.RelativeToParent((parent) => parent.Width),
-                        Constraint.RelativeToParent((parent) => parent.Height*0.5));
-
-                    // StatusText
-                    MainLayout.Children.Add(StatusText,
-                        Constraint.RelativeToParent((parent) => parent.X + 20),
-                        Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5 + 50),
-                        Constraint.RelativeToParent((parent) => parent.Width),
-                        Constraint.Constant(StatusText.Height));
-
-                    MainLayout.Children.Add(ForwardButton,
-                        Constraint.RelativeToParent((parent) => parent.X + 20),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(ReverseButton,
-                        Constraint.RelativeToParent((parent) => parent.X + 60),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(RightButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 95),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-
-                    MainLayout.Children.Add(LeftButton,
-                        Constraint.RelativeToParent((parent) => parent.Width - 135),
-                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
-                        Constraint.Constant(75),
-                        Constraint.Constant(75));
-                }
-                ConnectToCam();
+                currentOrientation = newWidth > newHeight
+                    ? Orientation.Horizontal
+                    : Orientation.Vertical;
+                DrawScreen();
             }
+        }
+
+
+        private void DrawScreen()
+        {
+            Settings settings = new Settings();
+            if (Servers.Items.Contains(SelectedServer))
+            {
+                settings = Settings.LoadSettings(SelectedServer);
+            }
+
+            if(currentOrientation == Orientation.Horizontal)
+            {
+                NavigationPage.SetHasNavigationBar(this, false);
+                MainLayout.Children.Clear();
+
+                //Car Cam View
+                MainLayout.Children.Add(CamWebView,
+                    Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15),
+                    Constraint.RelativeToParent((parent) => parent.Y),
+                    Constraint.RelativeToParent((parent) => parent.Width*0.7),
+                    Constraint.RelativeToParent((parent) => parent.Height));
+
+                // StatusText
+                MainLayout.Children.Add(StatusText,
+                    Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15 + 20),
+                    Constraint.RelativeToParent((parent) => parent.Height - StatusText.Height - 5),
+                    Constraint.RelativeToParent((parent) => parent.Width*0.7),
+                    Constraint.Constant(StatusText.Height));
+
+                if (settings.EnableControls)
+                {
+                    MainLayout.Children.Add(ForwardButton,
+                        Constraint.RelativeToParent((parent) => parent.X + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(ReverseButton,
+                        Constraint.RelativeToParent((parent) => parent.X + 60),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(RightButton,
+                        Constraint.RelativeToParent((parent) => parent.Width - 95),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 20),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(LeftButton,
+                        Constraint.RelativeToParent((parent) => parent.Width - 135),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.2 + 115),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+                }
+            }
+            else
+            {
+                NavigationPage.SetHasNavigationBar(this, false);
+                MainLayout.Children.Clear();
+
+                MainLayout.Children.Add(FakeToolbar,
+                    Constraint.Constant(0),
+                    Constraint.Constant(0),
+                    Constraint.RelativeToParent((parent) => parent.Width),
+                    Constraint.Constant(50));
+
+                FakeToolbar.Children.Clear();
+                FakeToolbar.Children.Add(Servers,
+                    Constraint.RelativeToParent((parent) => parent.X + 10),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - Servers.Height*0.5),
+                    Constraint.RelativeToParent((parent) => parent.Width*0.5));
+
+                FakeToolbar.Children.Add(EditButton,
+                    Constraint.RelativeToParent((parent) => parent.Width - 60),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - EditButton.Height*0.5));
+
+                FakeToolbar.Children.Add(RefreshButton,
+                    Constraint.RelativeToParent((parent) => parent.Width - 105),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - RefreshButton.Height*0.5));
+
+                // Car Cam View
+                MainLayout.Children.Add(CamWebView,
+                    Constraint.RelativeToParent((parent) => parent.X),
+                    Constraint.RelativeToParent((parent) => parent.Y + 50),
+                    Constraint.RelativeToParent((parent) => parent.Width),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5));
+
+                // StatusText
+                MainLayout.Children.Add(StatusText,
+                    Constraint.RelativeToParent((parent) => parent.X + 20),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5 + 50),
+                    Constraint.RelativeToParent((parent) => parent.Width),
+                    Constraint.Constant(StatusText.Height));
+
+                if (settings.EnableControls)
+                {
+                    MainLayout.Children.Add(ForwardButton,
+                        Constraint.RelativeToParent((parent) => parent.X + 20),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(ReverseButton,
+                        Constraint.RelativeToParent((parent) => parent.X + 60),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(RightButton,
+                        Constraint.RelativeToParent((parent) => parent.Width - 95),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 60),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+
+                    MainLayout.Children.Add(LeftButton,
+                        Constraint.RelativeToParent((parent) => parent.Width - 135),
+                        Constraint.RelativeToParent((parent) => parent.Y + parent.Height*0.5 + 155),
+                        Constraint.Constant(75),
+                        Constraint.Constant(75));
+                }
+            }
+            ConnectToCam();
+
         }
 
         private void Connect()
@@ -291,6 +320,7 @@ namespace PiCar
             if (_clientConnected) return;
 
             Settings settings = Settings.LoadSettings(Servers.Items[Servers.SelectedIndex]);
+            if (!settings.EnableControls) return;
             IWifi wifi = new Wifi();
 
             string server = wifi.GetSSID() == $"\"{settings.LocalSSID}\""

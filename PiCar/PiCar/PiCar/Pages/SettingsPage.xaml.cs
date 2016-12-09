@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Android.Content.PM;
+using Android.Content.Res;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -7,10 +9,12 @@ namespace PiCar
 	public partial class SettingsPage : ContentPage
 	{
 	    private readonly Settings settings;
+	    private double ControlsHeight;
 
         public SettingsPage(string name)
 		{
 		    InitializeComponent();
+
             BackgroundColor = Color.FromHex("#CFD8DC");
             settings = Settings.LoadSettings(name);
             NavigationPage.SetHasBackButton(this, false);
@@ -24,6 +28,12 @@ namespace PiCar
                 Servers.SelectedIndex = Servers.Items.IndexOf(name);
             BindingContext = settings;
 		}
+
+	    protected override void OnAppearing()
+	    {
+	        base.OnAppearing();
+            DependencyService.Get<IOrientate>().SetOrientation(ScreenOrientation.Portrait);
+        }
 
         private void SaveClick(object sender, EventArgs e)
         {
@@ -44,7 +54,12 @@ namespace PiCar
 	        }
 	    }
 
-	    private void AddClick(object sender, EventArgs e) => settings.AddServer();
+	    private void AddClick(object sender, EventArgs e)
+        {
+            if (EnableControlsCheckBox.Checked)
+                AnimateControls(false);
+            settings.AddServer();
+	    }
 
 	    private void ServersChanged(object sender, EventArgs e)
 	    {
@@ -52,7 +67,13 @@ namespace PiCar
 	        settings.LoadServer(Servers.Items[Servers.SelectedIndex]);
 	    }
 
-	    protected override bool OnBackButtonPressed()
+	    private void EnableControlsCheckBoxCheckChanged(object sender, EventArgs e)
+	    {
+	        AnimateControls(EnableControlsCheckBox.Checked);
+	    }
+
+
+        protected override bool OnBackButtonPressed()
         {
             CloseThis();
             return true;
@@ -64,5 +85,52 @@ namespace PiCar
             Settings.IsOpen = false;
             Navigation.PopAsync(true);
         }
-    }
+
+	    private void ControlsLayoutLayoutChanged(object sender, EventArgs e)
+        {
+            if (ControlsHeight == 0)
+                ControlsHeight = LayoutUserName.Height;
+
+            if (EnableControlsCheckBox.Checked)
+            {
+                LayoutUserName.HeightRequest = ControlsHeight;
+                LayoutMqttPort.HeightRequest = ControlsHeight;
+                LayoutPassword.HeightRequest = ControlsHeight;
+            }
+            else
+            {
+                LayoutUserName.HeightRequest = -10;
+                LayoutMqttPort.HeightRequest = -10;
+                LayoutPassword.HeightRequest = -10;
+            }
+        }
+
+	    private void AnimateControls(bool show)
+        {
+            Action<double> callBack = (input) =>
+            {
+                LayoutUserName.HeightRequest = input;
+                LayoutPassword.HeightRequest = input;
+                LayoutMqttPort.HeightRequest = input;
+            };
+            double startHeight;
+            double endingHeight;
+
+            if (show)
+            {
+                startHeight = -10;
+                endingHeight = ControlsHeight;
+            }
+            else
+            {
+                startHeight = LayoutUserName.Height;
+                ControlsHeight = LayoutUserName.Height;
+                endingHeight = -10;
+            }
+            const uint rate = 8;
+            const uint length = 1000;
+            Easing easing = Easing.CubicOut;
+            this.Animate("toggle", callBack, startHeight, endingHeight, rate, length, easing);
+        }
+	}
 }
