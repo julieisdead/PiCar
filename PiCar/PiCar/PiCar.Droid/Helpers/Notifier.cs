@@ -16,7 +16,7 @@ namespace PiCar.Droid
             if (Priority == ToastPriority.Low)
                 toast?.Cancel();
 
-            if(priority == ToastPriority.High && priority == ToastPriority.High)
+            if(Priority == ToastPriority.High && (priority == ToastPriority.High || priority == ToastPriority.Critical))
                 toast?.Cancel();
 
             if(toast != null && !toast.View.IsShown)
