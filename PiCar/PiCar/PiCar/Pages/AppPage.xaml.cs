@@ -160,6 +160,16 @@ namespace PiCar
                     Constraint.RelativeToParent((parent) => parent.Width*0.7),
                     Constraint.Constant(StatusText.Height));
 
+                MainLayout.Children.Add(EditButton,
+                    Constraint.RelativeToParent((parent) => parent.Width - 60),
+                    Constraint.RelativeToParent((parent) => 0));
+                EditButton.TextColor = Color.Gray;
+
+                MainLayout.Children.Add(RefreshButton,
+                    Constraint.RelativeToParent((parent) => parent.Width - 105),
+                    Constraint.RelativeToParent((parent) => 0));
+                RefreshButton.TextColor = Color.Gray;
+
                 if (settings.EnableControls)
                 {
                     MainLayout.Children.Add(ForwardButton,
@@ -207,10 +217,12 @@ namespace PiCar
                 FakeToolbar.Children.Add(EditButton,
                     Constraint.RelativeToParent((parent) => parent.Width - 60),
                     Constraint.RelativeToParent((parent) => parent.Height*0.5 - EditButton.Height*0.5));
+                EditButton.TextColor = Color.FromHex("#ECEFF1");
 
                 FakeToolbar.Children.Add(RefreshButton,
                     Constraint.RelativeToParent((parent) => parent.Width - 105),
                     Constraint.RelativeToParent((parent) => parent.Height*0.5 - RefreshButton.Height*0.5));
+                RefreshButton.TextColor = Color.FromHex("#ECEFF1");
 
                 // Car Cam View
                 MainLayout.Children.Add(CamWebView,
