@@ -3,13 +3,13 @@ using Xamarin.Forms;
 
 namespace PiCar
 {
-    public enum CarButtonState
+    internal enum CarButtonState
     {
         Down,
         Up
     }
 
-    public class CarButton : Button
+    internal class CarButton : Button
     {
         public CarButtonState State;
         public event EventHandler Touched;

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PiCar
+﻿namespace PiCar
 {
-    public interface IWifi
+    internal interface IWifi
     {
         string GetSSID();
     }

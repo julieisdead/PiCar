@@ -1,13 +1,11 @@
 using Android.Content.PM;
-using PiCar;
 using PiCar.Droid;
-using PiCar.Helpers;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(Orientate))]
-namespace PiCar.Helpers
+namespace PiCar.Droid
 {
-    class Orientate : IOrientate
+    internal class Orientate : IOrientate
     {
         public void SetOrientation(ScreenOrientation orientation)
         {

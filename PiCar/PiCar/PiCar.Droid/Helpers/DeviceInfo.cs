@@ -5,7 +5,7 @@ using XLabs.Platform.Device;
 [assembly: Dependency(typeof(DeviceInfo))]
 namespace PiCar.Droid
 {
-    public class DeviceInfo : IDeviceInfo
+    internal class DeviceInfo : IDeviceInfo
     {
         public DeviceInfo() { }
 

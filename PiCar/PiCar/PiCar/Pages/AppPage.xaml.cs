@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using Android.Content.PM;
 using Android.Widget;
 using MqttLib;
@@ -442,10 +441,12 @@ namespace PiCar
         private static void Toaster(string message)
             => Device.BeginInvokeOnMainThread(()
                 => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, ToastLength.Short));
-        // Not Used
-        //private static void Toaster(string message, ToastLength length)
-        //    => Device.BeginInvokeOnMainThread(()
-        //        => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, length));
+        /*
+        //Not used yet.
+        private static void Toaster(string message, ToastLength length)
+            => Device.BeginInvokeOnMainThread(()
+                => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, length));
+        /**/
         private static void Toaster(string message, ToastPriority priority)
             => Device.BeginInvokeOnMainThread(()
                 => DependencyService.Get<INotifier>().MakeToast(message, priority, ToastLength.Short));

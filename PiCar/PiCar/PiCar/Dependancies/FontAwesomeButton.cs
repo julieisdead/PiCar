@@ -1,9 +1,8 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 
 namespace PiCar
 {
-    public class FontAwesomeButton : Button
+    internal class FontAwesomeButton : Button
     {
         public const string Typeface = "FontAwesome";
         private FontAwesomeIconCode _fontAwesomeIcon;

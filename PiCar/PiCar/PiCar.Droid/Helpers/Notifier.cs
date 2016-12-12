@@ -5,7 +5,7 @@ using Xamarin.Forms;
 [assembly: Dependency(typeof(Notifier))]
 namespace PiCar.Droid
 {
-    public class Notifier : INotifier
+    internal class Notifier : INotifier
     {
         public static Toast toast;
         public static ToastPriority Priority;

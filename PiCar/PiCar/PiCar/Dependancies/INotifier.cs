@@ -2,7 +2,7 @@
 
 namespace PiCar
 {
-    public enum ToastPriority
+    internal enum ToastPriority
     {
         Low,
         High,

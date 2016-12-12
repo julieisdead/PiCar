@@ -11,7 +11,7 @@ namespace PiCar.Droid
     /// <summary>
     /// Add the FontAwesome.ttf to the Assets folder and mark as "Android Asset"
     /// </summary>
-    public class FontAwesomeButtonRenderer : ButtonRenderer
+    internal class FontAwesomeButtonRenderer : ButtonRenderer
     {
         public FontAwesomeButtonRenderer() {}
 

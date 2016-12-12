@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PiCar
+﻿namespace PiCar
 {
-    interface IBaseUrl
+    internal interface IBaseUrl
     {
         string Get();
     }

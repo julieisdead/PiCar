@@ -4,15 +4,15 @@ using XLabs.Serialization;
 
 namespace PiCar
 {
-	public class App : Application
+	internal class App : Application
 	{
-		public App()
+		internal App()
         {
             SetIoc();
             MainPage = new NavigationPage(new AppPage());
 		}
 
-        public void SetIoc()
+        internal void SetIoc()
         {
             if (Resolver.IsSet) return;
             SimpleContainer resolverContainer = new SimpleContainer();

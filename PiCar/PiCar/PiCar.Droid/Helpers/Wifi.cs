@@ -7,13 +7,14 @@ using Xamarin.Forms;
 namespace PiCar.Droid
 {
 
-    public class Wifi : IWifi
+    internal class Wifi : IWifi
     {
         public Wifi() { }
 
         public string GetSSID()
         {
-            WifiManager wifiManager = (WifiManager)(Android.App.Application.Context.GetSystemService(Context.WifiService));
+            WifiManager wifiManager =
+                (WifiManager) Android.App.Application.Context.GetSystemService(Context.WifiService);
             WifiInfo wifiInfo = wifiManager.ConnectionInfo;
             return wifiInfo.SSID;
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Android.Content.PM;
-using Android.Content.Res;
 using Xamarin.Forms;
 
 namespace PiCar
@@ -68,12 +67,10 @@ namespace PiCar
 	    }
 
 	    private void EnableControlsCheckBoxCheckChanged(object sender, EventArgs e)
-	    {
-	        AnimateControls(EnableControlsCheckBox.Checked);
-	    }
+	        => AnimateControls(EnableControlsCheckBox.Checked);
 
 
-        protected override bool OnBackButtonPressed()
+	    protected override bool OnBackButtonPressed()
         {
             CloseThis();
             return true;
@@ -88,7 +85,7 @@ namespace PiCar
 
 	    private void ControlsLayoutLayoutChanged(object sender, EventArgs e)
         {
-            if (ControlsHeight == 0)
+            if (Math.Abs(ControlsHeight) < 0.01f)
                 ControlsHeight = LayoutUserName.Height;
 
             if (EnableControlsCheckBox.Checked)
@@ -127,10 +124,7 @@ namespace PiCar
                 ControlsHeight = LayoutUserName.Height;
                 endingHeight = -10;
             }
-            const uint rate = 8;
-            const uint length = 1000;
-            Easing easing = Easing.CubicOut;
-            this.Animate("toggle", callBack, startHeight, endingHeight, rate, length, easing);
+            this.Animate("toggle", callBack, startHeight, endingHeight, 8, 1000, Easing.CubicInOut);
         }
 	}
 }

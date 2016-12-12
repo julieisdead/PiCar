@@ -8,7 +8,7 @@ using Xamarin.Forms.Platform.Android;
 [assembly: ExportRenderer(typeof(CarButton), typeof(CarButtonRenderer))]
 namespace PiCar.Droid
 {
-    public class CarButtonRenderer : ButtonRenderer
+    internal class CarButtonRenderer : ButtonRenderer
     {
         public override bool DispatchTouchEvent(MotionEvent e)
         {

@@ -1,6 +1,6 @@
 ﻿namespace PiCar
 {
-    public enum FontAwesomeIconCode
+    internal enum FontAwesomeIconCode
     {
         Check,
         Remove,
@@ -17,7 +17,7 @@
     /// Get more icons from https://zavoloklom.github.io/material-design-iconic-font/
     /// Tip: Just copy and past the icon picture here to get the icon
     /// </summary>
-    public class FontAwesomeIcon
+    internal class FontAwesomeIcon
     {
         public string GetIcon(FontAwesomeIconCode value)
         {

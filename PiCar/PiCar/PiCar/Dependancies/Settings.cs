@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,7 +8,7 @@ using Plugin.Settings.Abstractions;
 
 namespace PiCar
 {
-    public class Settings : INotifyPropertyChanged
+    internal class Settings : INotifyPropertyChanged
     {
         private const string SettingsKey = "4db3669d21624eb186a920a063997745";
         private static Dictionary<string, Settings> servers;
