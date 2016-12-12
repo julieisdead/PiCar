@@ -85,4 +85,7 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)MqttLib\Mqtt.txt" />
+  </ItemGroup>
 </Project>
