@@ -155,9 +155,9 @@ namespace PiCar
                 // StatusText
                 MainLayout.Children.Add(StatusText,
                     Constraint.RelativeToParent((parent) => parent.X + parent.Width*0.15 + 20),
-                    Constraint.RelativeToParent((parent) => parent.Height - StatusText.Height - 5),
+                    Constraint.RelativeToParent((parent) => CamWebView.Height - 50),
                     Constraint.RelativeToParent((parent) => parent.Width*0.7),
-                    Constraint.Constant(StatusText.Height));
+                    Constraint.Constant(24.7f));
 
                 MainLayout.Children.Add(EditButton,
                     Constraint.RelativeToParent((parent) => parent.Width - 60),
@@ -210,17 +210,17 @@ namespace PiCar
                 FakeToolbar.Children.Clear();
                 FakeToolbar.Children.Add(Servers,
                     Constraint.RelativeToParent((parent) => parent.X + 10),
-                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - Servers.Height*0.5),
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - 25),
                     Constraint.RelativeToParent((parent) => parent.Width*0.5));
 
                 FakeToolbar.Children.Add(EditButton,
                     Constraint.RelativeToParent((parent) => parent.Width - 60),
-                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - EditButton.Height*0.5));
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - 25));
                 EditButton.TextColor = Color.FromHex("#ECEFF1");
 
                 FakeToolbar.Children.Add(RefreshButton,
                     Constraint.RelativeToParent((parent) => parent.Width - 105),
-                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - RefreshButton.Height*0.5));
+                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - 25));
                 RefreshButton.TextColor = Color.FromHex("#ECEFF1");
 
                 // Car Cam View
@@ -233,9 +233,9 @@ namespace PiCar
                 // StatusText
                 MainLayout.Children.Add(StatusText,
                     Constraint.RelativeToParent((parent) => parent.X + 20),
-                    Constraint.RelativeToParent((parent) => parent.Height*0.5 - StatusText.Height*1.5 + 50),
+                    Constraint.RelativeToParent((parent) => CamWebView.Height),
                     Constraint.RelativeToParent((parent) => parent.Width),
-                    Constraint.Constant(StatusText.Height));
+                    Constraint.Constant(24.7f));
 
                 if (settings.EnableControls)
                 {
