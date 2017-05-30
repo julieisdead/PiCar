@@ -265,7 +265,6 @@ namespace PiCar
                 }
             }
             ConnectToCam();
-
         }
 
         private void Connect()
