@@ -441,7 +441,7 @@ namespace PiCar
         private static void Toaster(string message)
             => Device.BeginInvokeOnMainThread(()
                 => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, ToastLength.Short));
-        /*
+        /**
         //Not used yet.
         private static void Toaster(string message, ToastLength length)
             => Device.BeginInvokeOnMainThread(()
