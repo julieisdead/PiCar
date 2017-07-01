@@ -314,7 +314,7 @@ namespace PiCar
                           $"img{{width:{CamWebView.Width - 16};height:{CamWebView.Height - 16};position:fixed;}}" +
                           "</style><link rel=\"stylesheet\" type=\"text/css\" href=\"car-cam.css\" /></head><body>" +
                           "<div class=\"loader\">Loading...</div>" +
-                          $"<img class=\"camview\" src=\"http://{server}:{settings.CameraPort}/test.mjpg\" onerror=\"this.src = '';\" />" +
+                          $"<img class=\"camview\" src=\"http://{server}:{settings.CameraPort}/?action=stream\" onerror=\"this.src = '';\" />" +
                           "</body></html>";
 
             Device.BeginInvokeOnMainThread(() => CamWebView.LoadContent(html, DependencyService.Get<IBaseUrl>().Get()));
@@ -446,6 +446,7 @@ namespace PiCar
             => Device.BeginInvokeOnMainThread(()
                 => DependencyService.Get<INotifier>().MakeToast(message, ToastPriority.Low, length));
         /**/
+
         private static void Toaster(string message, ToastPriority priority)
             => Device.BeginInvokeOnMainThread(()
                 => DependencyService.Get<INotifier>().MakeToast(message, priority, ToastLength.Short));
