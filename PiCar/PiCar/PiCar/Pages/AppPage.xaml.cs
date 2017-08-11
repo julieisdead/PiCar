@@ -13,7 +13,7 @@ namespace PiCar
     public partial class AppPage : ContentPage
     {
         private Movement movement;
-        private static IMqtt client;
+        public static IMqtt client;
         private static ISettings AppSettings => CrossSettings.Current;
         private const string SettingsKey = "A68d709c745c446cace320c5ec07556f";
         public static string SelectedServer;
@@ -267,13 +267,13 @@ namespace PiCar
             ConnectToCam();
         }
 
-        private void Connect()
+        public void Connect()
         {
             ConnectToBroker();
             ConnectToCam();
         }
 
-        private void Disconnect()
+        public void Disconnect()
         {
             try
             {

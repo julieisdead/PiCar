@@ -6,11 +6,26 @@ namespace PiCar
 {
 	internal class App : Application
 	{
+        private AppPage appPage;
+
 		internal App()
         {
             SetIoc();
-            MainPage = new NavigationPage(new AppPage());
+            appPage = new AppPage();
+            MainPage = new NavigationPage(appPage);
 		}
+
+        protected override void OnSleep()
+        {
+            base.OnSleep();
+            appPage.Disconnect();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            appPage.Connect();
+        }
 
         internal void SetIoc()
         {
